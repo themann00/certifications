@@ -86,8 +86,8 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
         tags: selectedTags,
         featured,
       })
-    } catch {
-      setError('Failed to save. Please try again.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save. Please try again.')
       setSaving(false)
     }
   }
