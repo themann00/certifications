@@ -13,8 +13,9 @@ async function getBlobJson<T>(pathname: string, defaultValue: T): Promise<T> {
     const { blobs } = await list({ prefix: pathname, limit: 1 })
     const blob = blobs.find((b) => b.pathname === pathname)
     if (!blob) return defaultValue
-    // Private stores require the token in the Authorization header
-    const res = await fetch(`${blob.url}?t=${Date.now()}`, { cache: 'no-store' })
+    // Use downloadUrl (direct origin, no CDN) so reads are always fresh
+    const fetchUrl = (blob as { downloadUrl?: string }).downloadUrl ?? `${blob.url}?t=${Date.now()}`
+    const res = await fetch(fetchUrl, { cache: 'no-store' })
     if (!res.ok) return defaultValue
     return (await res.json()) as T
   } catch {
@@ -28,6 +29,7 @@ async function setBlobJson<T>(pathname: string, data: T): Promise<void> {
     access: 'public',
     addRandomSuffix: false,
     contentType: 'application/json',
+    cacheControlMaxAge: 0,
   })
 }
 
