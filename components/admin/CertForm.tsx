@@ -313,12 +313,28 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
             ))}
           </div>
           {expType === 'date' && (
-            <input
-              type="date"
-              className="admin-input max-w-xs"
-              value={expirationDate}
-              onChange={(e) => setExpirationDate(e.target.value)}
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                className="admin-input max-w-xs"
+                value={expirationDate}
+                onChange={(e) => setExpirationDate(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (!issueDate) return
+                  const d = new Date(issueDate)
+                  d.setFullYear(d.getFullYear() + 1)
+                  setExpirationDate(d.toISOString().split('T')[0])
+                }}
+                disabled={!issueDate}
+                className="btn-secondary !py-1.5 !px-3 font-body text-xs whitespace-nowrap disabled:opacity-40"
+                title="Set to 1 year after issue date"
+              >
+                +1 Year
+              </button>
+            </div>
           )}
         </div>
 

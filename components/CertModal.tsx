@@ -49,16 +49,23 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
 
         {/* Image or PDF */}
         {cert.fileType === 'pdf' && cert.imageUrl ? (
-          <div className="border-b-4 border-mondrian-black bg-gray-50 flex flex-col items-center justify-center py-14 gap-5">
-            <FileText size={56} className="text-mondrian-red" />
-            <a
-              href={cert.imageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border-2 border-mondrian-black px-6 py-2.5 font-body text-xs font-semibold uppercase tracking-widest hover:bg-mondrian-black hover:text-white transition-colors"
-            >
-              Open PDF →
-            </a>
+          <div className="border-b-4 border-mondrian-black flex flex-col">
+            <iframe
+              src={cert.imageUrl}
+              title={cert.name}
+              className="w-full"
+              style={{ height: '65vh' }}
+            />
+            <div className="border-t-2 border-mondrian-black px-4 py-2 flex justify-end bg-gray-50">
+              <a
+                href={cert.imageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-body text-xs font-semibold uppercase tracking-widest text-mondrian-black hover:text-mondrian-blue transition-colors flex items-center gap-1"
+              >
+                Open in new tab →
+              </a>
+            </div>
           </div>
         ) : cert.imageUrl ? (
           <div className="border-b-4 border-mondrian-black">
