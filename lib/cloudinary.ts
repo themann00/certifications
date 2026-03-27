@@ -10,7 +10,7 @@ export async function uploadImage(
   base64Data: string
 ): Promise<{ url: string; publicId: string }> {
   const result = await cloudinary.uploader.upload(base64Data, {
-    folder: 'certifications',
+    folder: 'jacobmann-me-certifications',
     resource_type: 'image',
   })
   return {
