@@ -28,7 +28,6 @@ async function getBlobJson<T>(pathname: string, defaultValue: T): Promise<T> {
 async function setBlobJson<T>(pathname: string, data: T): Promise<void> {
   const { put } = await import('@vercel/blob')
   await put(pathname, JSON.stringify(data, null, 2), {
-    access: 'private',
     addRandomSuffix: false,
     contentType: 'application/json',
   })
