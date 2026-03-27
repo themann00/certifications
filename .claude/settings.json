@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:jacobmann.me)",
+      "Bash(curl -s https://jacobmann.me)"
+    ]
+  }
+}
