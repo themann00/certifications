@@ -64,7 +64,7 @@ export default function CertificationsPage({
     <>
       <MondrianBackground />
 
-      <div className="relative z-10 min-h-screen">
+      <div className="relative z-10 min-h-screen bg-white/85 backdrop-blur-sm">
         {/* Header */}
         <header className="border-b-4 border-mondrian-black bg-mondrian-white/95 backdrop-blur-sm sticky top-0 z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between h-16">

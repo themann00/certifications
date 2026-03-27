@@ -81,6 +81,6 @@ export const STATUS_LABELS: Record<ExpirationStatus, string> = {
 export const STATUS_CLASSES: Record<ExpirationStatus, string> = {
   active: 'bg-mondrian-blue text-white border-mondrian-blue',
   expires_soon: 'bg-mondrian-yellow text-black border-mondrian-yellow',
-  expired: 'bg-mondrian-red text-white border-mondrian-red',
+  expired: 'bg-white text-gray-400 border-gray-400',
   no_expiration: 'bg-white text-black border-black',
 }
