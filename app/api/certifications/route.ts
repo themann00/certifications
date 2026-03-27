@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
     linkType: data.linkType ?? 'hidden',
     imageUrl: data.imageUrl ?? null,
     imagePublicId: data.imagePublicId ?? null,
+    fileType: data.fileType ?? null,
     tags: data.tags ?? [],
     featured: data.featured ?? false,
     createdAt: now,

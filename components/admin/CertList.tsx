@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Plus, Pencil, Trash2, Star, Loader2 } from 'lucide-react'
 import type { Certification, Tag } from '@/lib/types'
 import { formatDate, getExpirationStatus, STATUS_LABELS, STATUS_CLASSES } from '@/lib/utils'
@@ -14,6 +14,10 @@ interface CertListProps {
 }
 
 export default function CertList({ certifications, tags, onRefresh, onFetchFull }: CertListProps) {
+  const existingOrgs = useMemo(
+    () => [...new Set(certifications.map((c) => c.issuingOrg).filter(Boolean))].sort(),
+    [certifications]
+  )
   const [formMode, setFormMode] = useState<'none' | 'add' | 'edit'>('none')
   const [editingCert, setEditingCert] = useState<Certification | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -80,6 +84,7 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull 
           <CertForm
             initial={formMode === 'edit' ? (editingCert ?? undefined) : undefined}
             tags={tags}
+            existingOrgs={existingOrgs}
             onSave={handleSave}
             onCancel={() => {
               setFormMode('none')

@@ -11,7 +11,7 @@ export async function uploadImage(
 ): Promise<{ url: string; publicId: string }> {
   const result = await cloudinary.uploader.upload(base64Data, {
     folder: 'jacobmann-me-certifications',
-    resource_type: 'image',
+    resource_type: 'auto',
   })
   return {
     url: result.secure_url,

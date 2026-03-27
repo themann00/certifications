@@ -51,6 +51,7 @@ export async function PUT(
     imageUrl: data.imageUrl !== undefined ? data.imageUrl : existing.imageUrl,
     imagePublicId:
       data.imagePublicId !== undefined ? data.imagePublicId : existing.imagePublicId,
+    fileType: data.fileType !== undefined ? data.fileType : existing.fileType,
     tags: data.tags ?? existing.tags,
     featured: data.featured ?? existing.featured,
     updatedAt: new Date().toISOString(),

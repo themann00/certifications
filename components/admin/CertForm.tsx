@@ -1,33 +1,172 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Upload, X, Loader2 } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Upload, X, Loader2, ChevronDown, Plus, FileText, Check } from 'lucide-react'
 import type { Certification, Tag } from '@/lib/types'
 
 interface CertFormProps {
   initial?: Certification
   tags: Tag[]
+  existingOrgs: string[]
   onSave: (data: Partial<Certification>) => Promise<void>
   onCancel: () => void
 }
 
 type ExpType = 'date' | 'none'
 
-export default function CertForm({ initial, tags, onSave, onCancel }: CertFormProps) {
+// ─── Org Dropdown ─────────────────────────────────────────────────────────────
+
+function OrgDropdown({
+  value,
+  onChange,
+  existingOrgs,
+}: {
+  value: string
+  onChange: (v: string) => void
+  existingOrgs: string[]
+}) {
+  const [open, setOpen] = useState(false)
+  const [addingNew, setAddingNew] = useState(false)
+  const [newOrg, setNewOrg] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
+  const newOrgInputRef = useRef<HTMLInputElement>(null)
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+        setAddingNew(false)
+        setNewOrg('')
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  // Focus new org input when it appears
+  useEffect(() => {
+    if (addingNew) newOrgInputRef.current?.focus()
+  }, [addingNew])
+
+  function selectOrg(org: string) {
+    onChange(org)
+    setOpen(false)
+    setAddingNew(false)
+    setNewOrg('')
+  }
+
+  function confirmNewOrg() {
+    const trimmed = newOrg.trim()
+    if (!trimmed) return
+    selectOrg(trimmed)
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => { setOpen((v) => !v); setAddingNew(false) }}
+        className="admin-input flex items-center justify-between w-full text-left"
+      >
+        <span className={value ? 'text-black' : 'text-gray-400'}>
+          {value || 'Select or add organization…'}
+        </span>
+        <ChevronDown
+          size={14}
+          className={`flex-shrink-0 ml-2 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute z-20 top-full left-0 right-0 border-2 border-t-0 border-mondrian-black bg-white shadow-lg max-h-64 overflow-y-auto">
+          {existingOrgs.length === 0 && !addingNew && (
+            <div className="px-4 py-3 font-body text-xs text-gray-400 italic">
+              No organizations yet — add your first one below.
+            </div>
+          )}
+
+          {existingOrgs.map((org) => (
+            <button
+              key={org}
+              type="button"
+              onClick={() => selectOrg(org)}
+              className={`w-full text-left px-4 py-2.5 font-body text-sm hover:bg-gray-50 flex items-center justify-between transition-colors ${
+                value === org ? 'font-semibold' : ''
+              }`}
+            >
+              {org}
+              {value === org && <Check size={12} className="text-mondrian-blue" />}
+            </button>
+          ))}
+
+          {/* Divider */}
+          {existingOrgs.length > 0 && (
+            <div className="border-t-2 border-mondrian-black" />
+          )}
+
+          {/* Add new */}
+          {!addingNew ? (
+            <button
+              type="button"
+              onClick={() => setAddingNew(true)}
+              className="w-full text-left px-4 py-2.5 font-body text-xs font-semibold uppercase tracking-widest text-mondrian-blue hover:bg-blue-50 flex items-center gap-2 transition-colors"
+            >
+              <Plus size={12} /> Add New Organization
+            </button>
+          ) : (
+            <div className="p-3 border-t-2 border-mondrian-black bg-gray-50">
+              <input
+                ref={newOrgInputRef}
+                type="text"
+                value={newOrg}
+                onChange={(e) => setNewOrg(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') { e.preventDefault(); confirmNewOrg() }
+                  if (e.key === 'Escape') { setAddingNew(false); setNewOrg('') }
+                }}
+                placeholder="Organization name…"
+                className="admin-input mb-2 !py-1.5 text-sm"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={confirmNewOrg}
+                  disabled={!newOrg.trim()}
+                  className="btn-primary !py-1 !px-3 text-xs flex items-center gap-1 disabled:opacity-40"
+                >
+                  <Check size={11} /> Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAddingNew(false); setNewOrg('') }}
+                  className="btn-secondary !py-1 !px-3 text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Main Form ────────────────────────────────────────────────────────────────
+
+export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel }: CertFormProps) {
   const [name, setName] = useState(initial?.name ?? '')
   const [issuingOrg, setIssuingOrg] = useState(initial?.issuingOrg ?? '')
   const [issueDate, setIssueDate] = useState(initial?.issueDate ?? '')
-  const [expType, setExpType] = useState<ExpType>(
-    initial?.noExpiration ? 'none' : 'date'
-  )
+  const [expType, setExpType] = useState<ExpType>(initial?.noExpiration ? 'none' : 'date')
   const [expirationDate, setExpirationDate] = useState(initial?.expirationDate ?? '')
   const [certificationId, setCertificationId] = useState(initial?.certificationId ?? '')
   const [linkUrl, setLinkUrl] = useState(initial?.linkUrl ?? '')
-  const [linkType, setLinkType] = useState(
-    initial?.linkType ?? 'hidden'
-  )
+  const [linkType, setLinkType] = useState(initial?.linkType ?? 'hidden')
   const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? '')
   const [imagePublicId, setImagePublicId] = useState(initial?.imagePublicId ?? '')
+  const [fileType, setFileType] = useState<'image' | 'pdf' | null>(initial?.fileType ?? null)
   const [selectedTags, setSelectedTags] = useState<string[]>(initial?.tags ?? [])
   const [featured, setFeatured] = useState(initial?.featured ?? false)
 
@@ -42,6 +181,7 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
     if (!file) return
     setUploadError('')
     setUploading(true)
+    const detectedType: 'image' | 'pdf' = file.type === 'application/pdf' ? 'pdf' : 'image'
     try {
       const fd = new FormData()
       fd.append('file', file)
@@ -50,11 +190,19 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
       if (!res.ok) throw new Error(data.error ?? 'Upload failed')
       setImageUrl(data.url)
       setImagePublicId(data.publicId)
+      setFileType(detectedType)
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setUploading(false)
     }
+  }
+
+  function clearFile() {
+    setImageUrl('')
+    setImagePublicId('')
+    setFileType(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   function toggleTag(id: string) {
@@ -83,6 +231,7 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
         linkType: linkType as Certification['linkType'],
         imageUrl: imageUrl || null,
         imagePublicId: imagePublicId || null,
+        fileType: fileType,
         tags: selectedTags,
         featured,
       })
@@ -116,17 +265,15 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
           />
         </div>
 
-        {/* Issuing org */}
+        {/* Issuing org — dropdown */}
         <div>
           <label className="block font-body text-xs font-semibold uppercase tracking-widest mb-1.5">
             Issuing Organization <span className="text-mondrian-red">*</span>
           </label>
-          <input
-            className="admin-input"
+          <OrgDropdown
             value={issuingOrg}
-            onChange={(e) => setIssuingOrg(e.target.value)}
-            placeholder="e.g. Amazon Web Services"
-            required
+            onChange={setIssuingOrg}
+            existingOrgs={existingOrgs}
           />
         </div>
 
@@ -171,12 +318,11 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
               className="admin-input max-w-xs"
               value={expirationDate}
               onChange={(e) => setExpirationDate(e.target.value)}
-              placeholder="Expiration date"
             />
           )}
         </div>
 
-        {/* Cert ID (backend only) */}
+        {/* Cert ID */}
         <div>
           <label className="block font-body text-xs font-semibold uppercase tracking-widest mb-1.5">
             Certification ID
@@ -241,10 +387,10 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
           </div>
         </div>
 
-        {/* Image upload */}
+        {/* File upload — image or PDF */}
         <div className="sm:col-span-2">
           <label className="block font-body text-xs font-semibold uppercase tracking-widest mb-1.5">
-            Certificate Image
+            Certificate Image or PDF
           </label>
 
           <div className="flex gap-4 items-start flex-wrap">
@@ -259,33 +405,39 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
               ) : (
                 <Upload size={14} />
               )}
-              {uploading ? 'Uploading…' : imageUrl ? 'Replace Image' : 'Upload Image'}
+              {uploading ? 'Uploading…' : imageUrl ? 'Replace File' : 'Upload File'}
             </button>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,.pdf"
               className="hidden"
               onChange={handleFileChange}
             />
 
+            {/* Preview */}
             {imageUrl && (
               <div className="relative border-2 border-mondrian-black">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  className="h-24 w-auto object-contain"
-                />
+                {fileType === 'pdf' ? (
+                  <div className="h-24 w-24 flex flex-col items-center justify-center bg-gray-50 gap-1">
+                    <FileText size={28} className="text-mondrian-red" />
+                    <span className="font-body text-[10px] uppercase tracking-wider text-gray-500">
+                      PDF
+                    </span>
+                  </div>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="h-24 w-auto object-contain"
+                  />
+                )}
                 <button
                   type="button"
-                  onClick={() => {
-                    setImageUrl('')
-                    setImagePublicId('')
-                    if (fileInputRef.current) fileInputRef.current.value = ''
-                  }}
+                  onClick={clearFile}
                   className="absolute -top-2 -right-2 bg-mondrian-black text-white w-5 h-5 flex items-center justify-center"
-                  aria-label="Remove image"
+                  aria-label="Remove file"
                 >
                   <X size={12} />
                 </button>
@@ -315,9 +467,7 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
                     onChange={() => toggleTag(tag.id)}
                     className="w-3.5 h-3.5 accent-black"
                   />
-                  <span
-                    className={`w-2.5 h-2.5 ${tagColorDots[tag.color] ?? 'bg-black'}`}
-                  />
+                  <span className={`w-2.5 h-2.5 ${tagColorDots[tag.color] ?? 'bg-black'}`} />
                   <span className="font-body text-xs font-semibold uppercase tracking-wider">
                     {tag.name}
                   </span>
@@ -332,7 +482,6 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
         <p className="font-body text-xs text-mondrian-red font-semibold">{error}</p>
       )}
 
-      {/* Actions */}
       <div className="flex gap-3 pt-2 border-t-2 border-gray-100">
         <button
           type="submit"

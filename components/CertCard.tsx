@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, FileText } from 'lucide-react'
 import type { PublicCertification, Tag } from '@/lib/types'
 import {
   getExpirationStatus,
@@ -28,7 +28,9 @@ const TAG_COLOR_CLASSES: Record<string, string> = {
 export default function CertCard({ cert, tags, onClick, accentColor }: CertCardProps) {
   const status = getExpirationStatus(cert)
   const certTags = tags.filter((t) => cert.tags.includes(t.id))
-  const thumbnailUrl = cert.imageUrl ? getCloudinaryThumbnailUrl(cert.imageUrl) : null
+  const isPdf = cert.fileType === 'pdf'
+  const thumbnailUrl =
+    cert.imageUrl && !isPdf ? getCloudinaryThumbnailUrl(cert.imageUrl) : null
   const accent = accentColor ?? 'bg-mondrian-black'
 
   return (
@@ -43,7 +45,14 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
         style={{ height: 180 }}
         aria-label={`View ${cert.name} certificate image`}
       >
-        {thumbnailUrl ? (
+        {isPdf ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50">
+            <FileText size={36} className="text-mondrian-red" />
+            <span className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+              PDF
+            </span>
+          </div>
+        ) : thumbnailUrl ? (
           <Image
             src={thumbnailUrl}
             alt={cert.name}

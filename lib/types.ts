@@ -10,6 +10,7 @@ export interface Certification {
   linkType: 'my_cert' | 'description_page' | 'hidden'
   imageUrl: string | null
   imagePublicId: string | null // Cloudinary public_id, stored only
+  fileType: 'image' | 'pdf' | null
   tags: string[] // tag ids
   featured: boolean
   createdAt: string

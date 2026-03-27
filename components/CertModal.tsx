@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, FileText } from 'lucide-react'
 import type { PublicCertification } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 
@@ -47,8 +47,20 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
           </button>
         </div>
 
-        {/* Image */}
-        {cert.imageUrl ? (
+        {/* Image or PDF */}
+        {cert.fileType === 'pdf' && cert.imageUrl ? (
+          <div className="border-b-4 border-mondrian-black bg-gray-50 flex flex-col items-center justify-center py-14 gap-5">
+            <FileText size={56} className="text-mondrian-red" />
+            <a
+              href={cert.imageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-2 border-mondrian-black px-6 py-2.5 font-body text-xs font-semibold uppercase tracking-widest hover:bg-mondrian-black hover:text-white transition-colors"
+            >
+              Open PDF →
+            </a>
+          </div>
+        ) : cert.imageUrl ? (
           <div className="border-b-4 border-mondrian-black">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

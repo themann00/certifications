@@ -22,6 +22,13 @@ export function formatDate(dateStr: string): string {
 
 export function getCloudinaryThumbnailUrl(url: string, width = 400, height = 280): string {
   if (!url || !url.includes('res.cloudinary.com')) return url
+  const isPdf = url.toLowerCase().endsWith('.pdf')
+  if (isPdf) {
+    // Generate a JPEG thumbnail of page 1 for PDFs
+    return url
+      .replace('/upload/', `/upload/pg_1,c_fill,w_${width},h_${height}/`)
+      .replace(/\.pdf$/i, '.jpg')
+  }
   return url.replace('/upload/', `/upload/c_fill,w_${width},h_${height}/`)
 }
 
