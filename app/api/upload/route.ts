@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
     const { url, publicId } = await uploadImage(base64)
     return NextResponse.json({ url, publicId })
   } catch (error) {
-    console.error('Cloudinary upload error:', error)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Cloudinary upload error:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

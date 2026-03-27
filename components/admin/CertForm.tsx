@@ -46,12 +46,12 @@ export default function CertForm({ initial, tags, onSave, onCancel }: CertFormPr
       const fd = new FormData()
       fd.append('file', file)
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      if (!res.ok) throw new Error('Upload failed')
       const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Upload failed')
       setImageUrl(data.url)
       setImagePublicId(data.publicId)
-    } catch {
-      setUploadError('Image upload failed. Check Cloudinary config.')
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setUploading(false)
     }

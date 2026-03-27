@@ -43,7 +43,13 @@ export async function POST(request: NextRequest) {
     updatedAt: now,
   }
 
-  certs.push(newCert)
-  await setCertifications(certs)
-  return NextResponse.json(newCert, { status: 201 })
+  try {
+    certs.push(newCert)
+    await setCertifications(certs)
+    return NextResponse.json(newCert, { status: 201 })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('POST /api/certifications error:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }

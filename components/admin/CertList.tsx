@@ -31,7 +31,10 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull 
       }
     )
 
-    if (!res.ok) throw new Error('Save failed')
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.error ?? `Save failed (${res.status})`)
+    }
     setFormMode('none')
     setEditingCert(null)
     onRefresh()
