@@ -20,9 +20,11 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
   const [newName, setNewName] = useState('')
   const [newColor, setNewColor] = useState<Tag['color']>('black')
   const [adding, setAdding] = useState(false)
+  const [addError, setAddError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
   const [editColor, setEditColor] = useState<Tag['color']>('black')
+  const [editError, setEditError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -30,17 +32,21 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
   async function handleAdd() {
     if (!newName.trim()) return
     setSaving(true)
+    setAddError('')
     try {
       const res = await fetch('/api/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName.trim(), color: newColor }),
       })
-      if (!res.ok) throw new Error('Failed')
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? `Error ${res.status}`)
       setNewName('')
       setNewColor('black')
       setAdding(false)
       onRefresh()
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : 'Save failed')
     } finally {
       setSaving(false)
     }
@@ -50,20 +56,25 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
     setEditingId(tag.id)
     setEditName(tag.name)
     setEditColor(tag.color)
+    setEditError('')
   }
 
   async function handleUpdate() {
     if (!editingId) return
     setSaving(true)
+    setEditError('')
     try {
       const res = await fetch(`/api/tags/${editingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: editName.trim(), color: editColor }),
       })
-      if (!res.ok) throw new Error('Failed')
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? `Error ${res.status}`)
       setEditingId(null)
       onRefresh()
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : 'Save failed')
     } finally {
       setSaving(false)
     }
@@ -159,6 +170,9 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
               </button>
             </div>
           </div>
+          {addError && (
+            <p className="font-body text-xs text-mondrian-red mt-2">{addError}</p>
+          )}
         </div>
       )}
 
@@ -195,20 +209,25 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
                       />
                     ))}
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleUpdate}
-                      disabled={saving}
-                      className="btn-primary !py-1.5 !px-3 flex items-center gap-1 disabled:opacity-50"
-                    >
-                      {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                    </button>
-                    <button
-                      onClick={() => setEditingId(null)}
-                      className="btn-secondary !py-1.5 !px-3 flex items-center gap-1"
-                    >
-                      <X size={12} />
-                    </button>
+                  <div className="flex flex-col gap-1 items-end">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleUpdate}
+                        disabled={saving}
+                        className="btn-primary !py-1.5 !px-3 flex items-center gap-1 disabled:opacity-50"
+                      >
+                        {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="btn-secondary !py-1.5 !px-3 flex items-center gap-1"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                    {editError && (
+                      <p className="font-body text-[10px] text-mondrian-red">{editError}</p>
+                    )}
                   </div>
                 </>
               ) : (

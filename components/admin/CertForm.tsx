@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Upload, X, Loader2, ChevronDown, Plus, FileText, Check } from 'lucide-react'
 import type { Certification, Tag } from '@/lib/types'
 
@@ -176,6 +176,63 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
   const [error, setError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const DRAFT_KEY = 'cert-form-draft'
+
+  function clearFile() {
+    setImageUrl('')
+    setImagePublicId('')
+    setFileType(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  function handleReset() {
+    try { sessionStorage.removeItem(DRAFT_KEY) } catch {}
+    setName('')
+    setIssuingOrg('')
+    setIssueDate('')
+    setExpType('date')
+    setExpirationDate('')
+    setCertificationId('')
+    setLinkUrl('')
+    setLinkType('hidden')
+    setSelectedTags([])
+    setFeatured(false)
+    setError('')
+    clearFile()
+  }
+
+  // Restore draft on mount (add mode only)
+  useEffect(() => {
+    if (initial) return
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY)
+      if (!saved) return
+      const d = JSON.parse(saved)
+      if (d.name) setName(d.name)
+      if (d.issuingOrg) setIssuingOrg(d.issuingOrg)
+      if (d.issueDate) setIssueDate(d.issueDate)
+      if (d.expType) setExpType(d.expType)
+      if (d.expirationDate) setExpirationDate(d.expirationDate)
+      if (d.certificationId) setCertificationId(d.certificationId)
+      if (d.linkUrl) setLinkUrl(d.linkUrl)
+      if (d.linkType) setLinkType(d.linkType)
+      if (d.selectedTags) setSelectedTags(d.selectedTags)
+      if (d.featured !== undefined) setFeatured(d.featured)
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Auto-save draft on field changes (add mode only)
+  useEffect(() => {
+    if (initial) return
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+        name, issuingOrg, issueDate, expType, expirationDate,
+        certificationId, linkUrl, linkType, selectedTags, featured,
+      }))
+    } catch {}
+  }, [name, issuingOrg, issueDate, expType, expirationDate, certificationId, linkUrl, linkType, selectedTags, featured, initial])
+
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -196,13 +253,6 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
     } finally {
       setUploading(false)
     }
-  }
-
-  function clearFile() {
-    setImageUrl('')
-    setImagePublicId('')
-    setFileType(null)
-    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   function toggleTag(id: string) {
@@ -235,6 +285,7 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
         tags: selectedTags,
         featured,
       })
+      try { sessionStorage.removeItem(DRAFT_KEY) } catch {}
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save. Please try again.')
       setSaving(false)
@@ -250,6 +301,17 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-6">
+      {!initial && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="btn-secondary !py-1 !px-3 font-body text-xs"
+          >
+            Reset Form
+          </button>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Name */}
         <div className="sm:col-span-2">
@@ -507,7 +569,14 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
           {saving && <Loader2 size={14} className="animate-spin" />}
           {saving ? 'Saving…' : initial ? 'Update Certification' : 'Add Certification'}
         </button>
-        <button type="button" onClick={onCancel} className="btn-secondary">
+        <button
+          type="button"
+          onClick={() => {
+            if (!initial) try { sessionStorage.removeItem(DRAFT_KEY) } catch {}
+            onCancel()
+          }}
+          className="btn-secondary"
+        >
           Cancel
         </button>
       </div>

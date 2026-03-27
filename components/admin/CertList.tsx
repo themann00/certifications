@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Plus, Pencil, Trash2, Star, Loader2 } from 'lucide-react'
 import type { Certification, Tag } from '@/lib/types'
-import { formatDate, getExpirationStatus, STATUS_LABELS, STATUS_CLASSES } from '@/lib/utils'
+import { formatDate, getExpirationStatus, STATUS_LABELS, STATUS_CLASSES, getCloudinaryThumbnailUrl } from '@/lib/utils'
 import CertForm from './CertForm'
 
 interface CertListProps {
@@ -11,9 +11,10 @@ interface CertListProps {
   tags: Tag[]
   onRefresh: () => void
   onFetchFull: (id: string) => Promise<Certification | null>
+  resetKey?: number
 }
 
-export default function CertList({ certifications, tags, onRefresh, onFetchFull }: CertListProps) {
+export default function CertList({ certifications, tags, onRefresh, onFetchFull, resetKey }: CertListProps) {
   const existingOrgs = useMemo(
     () => [...new Set(certifications.map((c) => c.issuingOrg).filter(Boolean))].sort(),
     [certifications]
@@ -22,6 +23,13 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull 
   const [editingCert, setEditingCert] = useState<Certification | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+
+  // Close form when parent signals a reset (e.g. tab re-clicked)
+  useEffect(() => {
+    if (resetKey === undefined || resetKey === 0) return
+    setFormMode('none')
+    setEditingCert(null)
+  }, [resetKey])
 
   async function handleSave(data: Partial<Certification>) {
     const isEdit = formMode === 'edit' && editingCert
@@ -132,7 +140,7 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull 
                   {cert.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={cert.imageUrl.replace('/upload/', '/upload/c_fill,w_64,h_48/')}
+                      src={getCloudinaryThumbnailUrl(cert.imageUrl, 64, 48) ?? cert.imageUrl}
                       alt={cert.name}
                       className="w-full h-full object-cover"
                     />

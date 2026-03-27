@@ -21,6 +21,7 @@ const TABS: { id: TabId; label: string }[] = [
 
 export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabId>('certifications')
+  const [certResetKey, setCertResetKey] = useState(0)
   const [certifications, setCertifications] = useState<Certification[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [settings, setSettings] = useState<Settings>({ showStats: true })
@@ -71,7 +72,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
-    onLogout()
+    window.location.href = '/'
   }
 
   return (
@@ -124,7 +125,12 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           {TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                if (tab.id === activeTab && tab.id === 'certifications') {
+                  setCertResetKey((k) => k + 1)
+                }
+                setActiveTab(tab.id)
+              }}
               className={`px-6 py-3 font-body text-xs font-semibold uppercase tracking-widest border-b-4 -mb-[4px] transition-colors ${
                 activeTab === tab.id
                   ? 'border-mondrian-blue text-mondrian-blue'
@@ -159,6 +165,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 tags={tags}
                 onRefresh={fetchAll}
                 onFetchFull={fetchFullCert}
+                resetKey={certResetKey}
               />
             )}
             {activeTab === 'tags' && (

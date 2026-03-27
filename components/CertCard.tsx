@@ -102,20 +102,18 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
           </span>
         </div>
 
-        {certTags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {certTags.map((tag) => (
-              <span
-                key={tag.id}
-                className={`font-body text-[10px] font-semibold px-1.5 py-0.5 uppercase tracking-wider ${
-                  TAG_COLOR_CLASSES[tag.color] ?? TAG_COLOR_CLASSES.black
-                }`}
-              >
-                {tag.name}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-1 min-h-[22px]">
+          {certTags.map((tag) => (
+            <span
+              key={tag.id}
+              className={`font-body text-[10px] font-semibold px-1.5 py-0.5 uppercase tracking-wider ${
+                TAG_COLOR_CLASSES[tag.color] ?? TAG_COLOR_CLASSES.black
+              }`}
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
 
         {/* Spacer */}
         <div className="flex-1" />
