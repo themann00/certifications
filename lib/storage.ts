@@ -13,7 +13,11 @@ async function getBlobJson<T>(pathname: string, defaultValue: T): Promise<T> {
     const { blobs } = await list({ prefix: pathname, limit: 1 })
     const blob = blobs.find((b) => b.pathname === pathname)
     if (!blob) return defaultValue
-    const res = await fetch(blob.url, { cache: 'no-store' })
+    // Private stores require the token in the Authorization header
+    const res = await fetch(blob.url, {
+      headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` },
+      cache: 'no-store',
+    })
     if (!res.ok) return defaultValue
     return (await res.json()) as T
   } catch {
@@ -24,7 +28,7 @@ async function getBlobJson<T>(pathname: string, defaultValue: T): Promise<T> {
 async function setBlobJson<T>(pathname: string, data: T): Promise<void> {
   const { put } = await import('@vercel/blob')
   await put(pathname, JSON.stringify(data, null, 2), {
-    access: 'public',
+    access: 'private',
     addRandomSuffix: false,
     contentType: 'application/json',
   })
