@@ -103,7 +103,7 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-bold text-xl">
-          Tags
+          Skills
           <span className="ml-2 font-body text-sm font-normal text-gray-400">
             ({tags.length})
           </span>
@@ -113,7 +113,7 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
             onClick={() => setAdding(true)}
             className="btn-primary flex items-center gap-2"
           >
-            <Plus size={14} /> Add Tag
+            <Plus size={14} /> Add Skill
           </button>
         )}
       </div>
@@ -124,7 +124,7 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
           <div className="flex items-end gap-3 flex-wrap">
             <div className="flex-1 min-w-40">
               <label className="block font-body text-xs font-semibold uppercase tracking-widest mb-1.5">
-                Tag Name
+                Skill Name
               </label>
               <input
                 className="admin-input"
@@ -180,7 +180,7 @@ export default function TagManager({ tags, onRefresh }: TagManagerProps) {
       {tags.length === 0 ? (
         <div className="border-4 border-dashed border-gray-200 p-10 text-center">
           <p className="font-body text-sm text-gray-400 uppercase tracking-widest">
-            No tags yet.
+            No skills yet.
           </p>
         </div>
       ) : (

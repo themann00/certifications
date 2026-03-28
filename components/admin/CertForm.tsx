@@ -10,6 +10,7 @@ interface CertFormProps {
   existingOrgs: string[]
   onSave: (data: Partial<Certification>) => Promise<void>
   onCancel: () => void
+  onOpenSkillsModal?: () => void
 }
 
 type ExpType = 'date' | 'none'
@@ -155,7 +156,109 @@ function OrgDropdown({
 
 // ─── Main Form ────────────────────────────────────────────────────────────────
 
-export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel }: CertFormProps) {
+const TAG_DOT: Record<string, string> = {
+  red: 'bg-mondrian-red',
+  blue: 'bg-mondrian-blue',
+  yellow: 'bg-mondrian-yellow',
+  black: 'bg-mondrian-black',
+}
+
+const TAG_CHIP: Record<string, string> = {
+  red: 'bg-mondrian-red text-white',
+  blue: 'bg-mondrian-blue text-white',
+  yellow: 'bg-mondrian-yellow text-black',
+  black: 'bg-mondrian-black text-white',
+}
+
+function SkillSelect({
+  tags,
+  selected,
+  onChange,
+  onAddNew,
+}: {
+  tags: Tag[]
+  selected: string[]
+  onChange: (ids: string[]) => void
+  onAddNew?: () => void
+}) {
+  const [search, setSearch] = useState('')
+  const filtered = tags.filter((t) =>
+    t.name.toLowerCase().includes(search.toLowerCase())
+  )
+  const selectedTags = tags.filter((t) => selected.includes(t.id))
+
+  function toggle(id: string) {
+    onChange(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id])
+  }
+
+  return (
+    <div>
+      {selectedTags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {selectedTags.map((tag) => (
+            <button
+              key={tag.id}
+              type="button"
+              onClick={() => toggle(tag.id)}
+              className={`flex items-center gap-1 px-2 py-0.5 font-body text-xs font-semibold uppercase tracking-wider ${TAG_CHIP[tag.color] ?? TAG_CHIP.black}`}
+            >
+              {tag.name}
+              <X size={10} />
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="border-2 border-mondrian-black">
+        <div className="flex items-center">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search skills…"
+            className="flex-1 px-3 py-2 font-body text-sm outline-none bg-transparent"
+          />
+          {onAddNew && (
+            <button
+              type="button"
+              onClick={onAddNew}
+              className="border-l-2 border-mondrian-black px-3 py-2 font-body text-xs font-semibold uppercase tracking-widest text-mondrian-blue hover:bg-blue-50 transition-colors whitespace-nowrap flex items-center gap-1"
+            >
+              <Plus size={11} /> New Skill
+            </button>
+          )}
+        </div>
+        <div className="border-t-2 border-mondrian-black max-h-44 overflow-y-auto">
+          {tags.length === 0 ? (
+            <p className="px-3 py-3 font-body text-xs text-gray-400 italic">
+              No skills yet — add one with the button above.
+            </p>
+          ) : filtered.length === 0 ? (
+            <p className="px-3 py-3 font-body text-xs text-gray-400 italic">No matches.</p>
+          ) : (
+            filtered.map((tag) => (
+              <button
+                key={tag.id}
+                type="button"
+                onClick={() => toggle(tag.id)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 hover:bg-gray-50 transition-colors ${
+                  selected.includes(tag.id) ? 'bg-gray-50' : ''
+                }`}
+              >
+                <div className={`w-2.5 h-2.5 flex-shrink-0 ${TAG_DOT[tag.color] ?? 'bg-black'}`} />
+                <span className="font-body text-sm flex-1 text-left">{tag.name}</span>
+                {selected.includes(tag.id) && (
+                  <Check size={13} className="text-mondrian-blue flex-shrink-0" />
+                )}
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel, onOpenSkillsModal }: CertFormProps) {
   const [name, setName] = useState(initial?.name ?? '')
   const [issuingOrg, setIssuingOrg] = useState(initial?.issuingOrg ?? '')
   const [issueDate, setIssueDate] = useState(initial?.issueDate ?? '')
@@ -255,12 +358,6 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
     }
   }
 
-  function toggleTag(id: string) {
-    setSelectedTags((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
-    )
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name || !issuingOrg || !issueDate) {
@@ -290,13 +387,6 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
       setError(err instanceof Error ? err.message : 'Failed to save. Please try again.')
       setSaving(false)
     }
-  }
-
-  const tagColorDots: Record<string, string> = {
-    red: 'bg-mondrian-red',
-    blue: 'bg-mondrian-blue',
-    yellow: 'bg-mondrian-yellow',
-    black: 'bg-mondrian-black',
   }
 
   return (
@@ -527,33 +617,18 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
           )}
         </div>
 
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="sm:col-span-2">
-            <label className="block font-body text-xs font-semibold uppercase tracking-widest mb-2">
-              Tags
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <label
-                  key={tag.id}
-                  className="flex items-center gap-2 border-2 border-mondrian-black px-3 py-1.5 cursor-pointer hover:bg-gray-50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedTags.includes(tag.id)}
-                    onChange={() => toggleTag(tag.id)}
-                    className="w-3.5 h-3.5 accent-black"
-                  />
-                  <span className={`w-2.5 h-2.5 ${tagColorDots[tag.color] ?? 'bg-black'}`} />
-                  <span className="font-body text-xs font-semibold uppercase tracking-wider">
-                    {tag.name}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Skills */}
+        <div className="sm:col-span-2">
+          <label className="block font-body text-xs font-semibold uppercase tracking-widest mb-2">
+            Skills
+          </label>
+          <SkillSelect
+            tags={tags}
+            selected={selectedTags}
+            onChange={setSelectedTags}
+            onAddNew={onOpenSkillsModal}
+          />
+        </div>
       </div>
 
       {error && (

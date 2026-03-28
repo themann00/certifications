@@ -12,9 +12,10 @@ interface CertListProps {
   onRefresh: () => void
   onFetchFull: (id: string) => Promise<Certification | null>
   resetKey?: number
+  onOpenSkillsModal?: () => void
 }
 
-export default function CertList({ certifications, tags, onRefresh, onFetchFull, resetKey }: CertListProps) {
+export default function CertList({ certifications, tags, onRefresh, onFetchFull, resetKey, onOpenSkillsModal }: CertListProps) {
   const existingOrgs = useMemo(
     () => [...new Set(certifications.map((c) => c.issuingOrg).filter(Boolean))].sort(),
     [certifications]
@@ -98,6 +99,7 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull,
               setFormMode('none')
               setEditingCert(null)
             }}
+            onOpenSkillsModal={onOpenSkillsModal}
           />
         </div>
       )}

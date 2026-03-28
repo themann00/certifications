@@ -179,11 +179,11 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
             </div>
           </div>
 
-          {/* Tags */}
+          {/* Skills */}
           {tags.length > 0 && (
             <div>
               <div className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">
-                Tags
+                Skills
               </div>
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
