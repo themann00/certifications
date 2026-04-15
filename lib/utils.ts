@@ -20,14 +20,15 @@ export function formatDate(dateStr: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
 
-export function getCloudinaryThumbnailUrl(url: string, width = 400, height = 280): string {
+export function getCloudinaryThumbnailUrl(url: string, width = 400, height = 280, forceAsPdf = false): string {
   if (!url || !url.includes('res.cloudinary.com')) return url
-  const isPdf = url.toLowerCase().endsWith('.pdf')
+  const isPdf = forceAsPdf || url.toLowerCase().includes('.pdf')
   if (isPdf) {
-    // Generate a JPEG thumbnail of page 1 for PDFs
-    return url
-      .replace('/upload/', `/upload/pg_1,c_fill,w_${width},h_${height}/`)
-      .replace(/\.pdf$/i, '.jpg')
+    // Normalize raw/upload → image/upload so transformations apply
+    const normalized = url.replace('/raw/upload/', '/image/upload/')
+    // Strip .pdf extension (with optional query string) before appending .jpg
+    const withoutExt = normalized.replace(/\.pdf(\?.*)?$/i, '$1')
+    return withoutExt.replace('/upload/', `/upload/pg_1,c_fill,w_${width},h_${height}/`) + '.jpg'
   }
   return url.replace('/upload/', `/upload/c_fill,w_${width},h_${height}/`)
 }

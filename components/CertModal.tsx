@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { X, FileText } from 'lucide-react'
 import type { PublicCertification } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getCloudinaryThumbnailUrl } from '@/lib/utils'
 
 interface CertModalProps {
   cert: PublicCertification
@@ -50,20 +50,23 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
         {/* Image or PDF */}
         {cert.fileType === 'pdf' && cert.imageUrl ? (
           <div className="border-b-4 border-mondrian-black flex flex-col">
-            <iframe
-              src={cert.imageUrl}
-              title={cert.name}
-              className="w-full"
-              style={{ height: '65vh' }}
+            {/* Render page 1 as an image — avoids iframe embedding/CORS issues */}
+            <img
+              src={getCloudinaryThumbnailUrl(cert.imageUrl, 900, 1200, true)}
+              alt={`${cert.name} — page 1 preview`}
+              className="w-full object-contain"
             />
-            <div className="border-t-2 border-mondrian-black px-4 py-2 flex justify-end bg-gray-50">
+            <div className="border-t-2 border-mondrian-black px-4 py-2 flex justify-between items-center bg-gray-50">
+              <span className="flex items-center gap-1.5 font-body text-xs text-gray-400 uppercase tracking-widest">
+                <FileText size={13} /> PDF
+              </span>
               <a
                 href={cert.imageUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-body text-xs font-semibold uppercase tracking-widest text-mondrian-black hover:text-mondrian-blue transition-colors flex items-center gap-1"
               >
-                Open in new tab →
+                Open full PDF →
               </a>
             </div>
           </div>

@@ -32,7 +32,7 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
   const certTags = tags.filter((t) => cert.tags.includes(t.id))
   const isPdf = cert.fileType === 'pdf'
   // For PDFs: use Cloudinary's page-1 JPEG transformation as the thumbnail
-  const thumbnailUrl = cert.imageUrl ? getCloudinaryThumbnailUrl(cert.imageUrl) : null
+  const thumbnailUrl = cert.imageUrl ? getCloudinaryThumbnailUrl(cert.imageUrl, 400, 280, isPdf) : null
   const accent = accentColor ?? 'bg-mondrian-black'
 
   return (
