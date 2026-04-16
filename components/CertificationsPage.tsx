@@ -28,6 +28,14 @@ const DEFAULT_FILTERS: FilterState = {
   sortDir: 'desc',
 }
 
+// Stat row width options (flex ratios): 25/25/50, 25/50/25, 50/25/25, 33/33/33
+const STAT_LAYOUTS = [
+  [1, 1, 2],
+  [1, 2, 1],
+  [2, 1, 1],
+  [1, 1, 1],
+] as const
+
 export default function CertificationsPage({
   certifications,
   tags,
@@ -35,6 +43,11 @@ export default function CertificationsPage({
 }: CertificationsPageProps) {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS)
   const [modalCert, setModalCert] = useState<PublicCertification | null>(null)
+
+  // Randomize stat widths on each page load
+  const [statLayout] = useState(
+    () => STAT_LAYOUTS[Math.floor(Math.random() * STAT_LAYOUTS.length)]
+  )
 
   const orgs = useMemo(
     () => [...new Set(certifications.map((c) => c.issuingOrg))].sort(),
@@ -57,7 +70,7 @@ export default function CertificationsPage({
     return { featured: [], rest: sorted }
   }, [filtered, filters])
 
-  // Stats for the hero grid
+  // Stats
   const total = certifications.length
   const active = certifications.filter(
     (c) => getExpirationStatus(c) === 'active' || getExpirationStatus(c) === 'no_expiration'
@@ -66,11 +79,9 @@ export default function CertificationsPage({
 
   return (
     <>
-      {/* Solid black page — Mondrian grid fills left to right, top to bottom */}
       <div className="min-h-screen bg-black">
 
-        {/* ── Header ─────────────────────────────────────────────────────
-            Vertical border separator pattern from jacobmann.me SiteNav   */}
+        {/* ── Header ─────────────────────────────────────────────────────── */}
         <header className="bg-black border-b-[3px] border-mondrian-white/10 sticky top-0 z-20">
           <div className="flex items-stretch">
             <a
@@ -95,50 +106,58 @@ export default function CertificationsPage({
           </div>
         </header>
 
-        {/* ── Hero grid — Title + Stats ───────────────────────────────
-            bg-black + p-[3px]: black bleeds through as borders (jacobmann.me pattern) */}
-        <div className="bg-black p-[3px] grid grid-cols-2 md:grid-cols-4 gap-0">
+        {/* ── Hero grid — full width, left to right ──────────────────────
+            Row 1: Title (3col) | Black accent box (1col)
+            Row 2: All 3 stats in one row, widths randomised each load      */}
+        <div className="bg-black p-[3px] grid grid-cols-2 md:grid-cols-4 gap-[3px]">
 
-          {/* Title block */}
+          {/* Title */}
           <div className="col-span-2 md:col-span-3 bg-mondrian-white flex items-end p-6 md:p-10 min-h-[160px]">
             <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-black leading-none uppercase tracking-tight">
               Credentials
             </h1>
           </div>
 
-          {/* Red stat — Total */}
-          {settings.showStats && total > 0 ? (
-            <div className="bg-mondrian-red flex flex-col items-center justify-center py-8 text-center col-span-1 md:col-span-1 row-span-1">
-              <div className="text-4xl md:text-6xl font-black text-white leading-none">{total}</div>
-              <div className="text-white text-[10px] font-black uppercase tracking-widest mt-2">Total</div>
-            </div>
-          ) : (
-            <div className="bg-mondrian-red col-span-1 md:col-span-1" />
-          )}
+          {/* Black accent box — replaces the old Total tile */}
+          <div className="col-span-1 bg-black" />
 
-          {/* Blue stat — Active */}
+          {/* Stats row — full width, randomised flex ratios */}
           {settings.showStats && total > 0 ? (
-            <div className="bg-mondrian-blue flex flex-col items-center justify-center py-8 text-center col-span-1">
-              <div className="text-4xl md:text-6xl font-black text-white leading-none">{active}</div>
-              <div className="text-white text-[10px] font-black uppercase tracking-widest mt-2">Active</div>
+            <div className="col-span-2 md:col-span-4 bg-black flex gap-[3px]">
+              <div
+                className="bg-mondrian-red flex flex-col items-center justify-center py-8 text-center"
+                style={{ flex: statLayout[0] }}
+              >
+                <div className="text-4xl md:text-6xl font-black text-white leading-none">{total}</div>
+                <div className="text-white text-[10px] font-black uppercase tracking-widest mt-2">Total</div>
+              </div>
+              <div
+                className="bg-mondrian-blue flex flex-col items-center justify-center py-8 text-center"
+                style={{ flex: statLayout[1] }}
+              >
+                <div className="text-4xl md:text-6xl font-black text-white leading-none">{active}</div>
+                <div className="text-white text-[10px] font-black uppercase tracking-widest mt-2">Active</div>
+              </div>
+              <div
+                className="bg-mondrian-yellow flex flex-col items-center justify-center py-8 text-center"
+                style={{ flex: statLayout[2] }}
+              >
+                <div className="text-4xl md:text-6xl font-black text-black leading-none">{issuers}</div>
+                <div className="text-black text-[10px] font-black uppercase tracking-widest mt-2">Issuing Bodies</div>
+              </div>
             </div>
           ) : (
-            <div className="bg-mondrian-blue col-span-1" />
-          )}
-
-          {/* Yellow stat — Issuers, spans 3 cols desktop to fill row */}
-          {settings.showStats && total > 0 ? (
-            <div className="bg-mondrian-yellow flex flex-col items-center justify-center py-8 text-center col-span-1 md:col-span-3">
-              <div className="text-4xl md:text-6xl font-black text-black leading-none">{issuers}</div>
-              <div className="text-black text-[10px] font-black uppercase tracking-widest mt-2">Issuing Bodies</div>
+            /* Decorative colour row when stats are hidden */
+            <div className="col-span-2 md:col-span-4 bg-black flex gap-[3px]">
+              <div className="bg-mondrian-red h-6" style={{ flex: 2 }} />
+              <div className="bg-mondrian-blue h-6" style={{ flex: 1 }} />
+              <div className="bg-mondrian-yellow h-6" style={{ flex: 3 }} />
             </div>
-          ) : (
-            <div className="bg-mondrian-yellow col-span-1 md:col-span-3" />
           )}
 
         </div>
 
-        {/* ── Filter / Sort bar ───────────────────────────────────────── */}
+        {/* ── Filter / Sort bar — full width ─────────────────────────────── */}
         <div className="bg-black p-[3px] pt-0">
           <FilterSortBar
             filters={filters}
@@ -148,88 +167,115 @@ export default function CertificationsPage({
           />
         </div>
 
-        {/* ── Empty states ─────────────────────────────────────────────── */}
-        {certifications.length === 0 && (
-          <div className="bg-black p-[3px] pt-0">
-            <div className="bg-mondrian-white p-16 text-center">
-              <p className="font-black text-sm uppercase tracking-widest text-gray-400">
-                No certifications yet.
-              </p>
+        {/* ── Below-filter content — constrained to 1200px, Mondrian sides ─
+            Absolute side panels fill the wrapper height automatically.
+            Center content is max-w-[1200px] centered.
+            Side panels appear at viewports ≥ 1400px.                        */}
+        <div className="relative bg-black">
+
+          {/* Mondrian side panels — pointer-events-none, decorative only */}
+          <div
+            className="absolute inset-0 hidden min-[1400px]:flex pointer-events-none"
+            aria-hidden="true"
+          >
+            {/* Left panel */}
+            <div className="flex flex-col flex-1 gap-[3px] p-[3px] pr-0 pt-0">
+              <div className="bg-mondrian-red"    style={{ flex: '2 0 0' }} />
+              <div className="bg-mondrian-blue"   style={{ flex: '1 0 0' }} />
+              <div className="bg-mondrian-yellow" style={{ flex: '3 0 0' }} />
+              <div className="bg-mondrian-red"    style={{ flex: '1 0 0' }} />
+              <div className="bg-mondrian-blue"   style={{ flex: '2 0 0' }} />
+              <div className="bg-mondrian-yellow" style={{ flex: '1 0 0' }} />
+            </div>
+
+            {/* Spacer — same width as the center content box */}
+            <div className="flex-none w-[1200px]" />
+
+            {/* Right panel */}
+            <div className="flex flex-col flex-1 gap-[3px] p-[3px] pl-0 pt-0">
+              <div className="bg-mondrian-yellow" style={{ flex: '1 0 0' }} />
+              <div className="bg-mondrian-red"    style={{ flex: '3 0 0' }} />
+              <div className="bg-mondrian-blue"   style={{ flex: '2 0 0' }} />
+              <div className="bg-mondrian-yellow" style={{ flex: '1 0 0' }} />
+              <div className="bg-mondrian-red"    style={{ flex: '1 0 0' }} />
+              <div className="bg-mondrian-blue"   style={{ flex: '2 0 0' }} />
             </div>
           </div>
-        )}
 
-        {certifications.length > 0 && filtered.length === 0 && (
-          <div className="bg-black p-[3px] pt-0">
-            <div className="bg-mondrian-white p-16 text-center">
-              <p className="font-black text-sm uppercase tracking-widest text-gray-400">
-                No certifications match the current filters.
-              </p>
-            </div>
-          </div>
-        )}
+          {/* Center content — sits above side panels via z-10 */}
+          <div className="relative z-10 max-w-[1200px] mx-auto p-[3px] pt-0 flex flex-col gap-[3px]">
 
-        {/* ── Featured section ─────────────────────────────────────────── */}
-        {filters.separateFeatured && featured.length > 0 && (
-          <>
-            {/* Section label */}
-            <div className="bg-black px-[3px]">
-              <div className="bg-black flex items-center gap-4 px-5 py-3">
-                <span className="font-black text-xs uppercase tracking-widest text-mondrian-yellow">
-                  Featured
-                </span>
-                <div className="flex gap-1">
-                  <div className="h-[3px] w-5 bg-mondrian-red" />
-                  <div className="h-[3px] w-5 bg-mondrian-blue" />
-                  <div className="h-[3px] w-5 bg-mondrian-yellow" />
-                </div>
-              </div>
-            </div>
-
-            {/* Featured cards grid — bg-black p-[3px] = black borders */}
-            <div className="bg-black p-[3px] pt-0 grid grid-cols-2 md:grid-cols-4 gap-0">
-              {featured.map((cert, i) => (
-                <CertCard
-                  key={cert.id}
-                  cert={cert}
-                  tags={tags}
-                  onClick={() => setModalCert(cert)}
-                  accentColor={FEATURED_ACCENTS[i % FEATURED_ACCENTS.length]}
-                />
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* ── All / Remaining certifications ──────────────────────────── */}
-        {rest.length > 0 && (
-          <>
-            {/* Section label — only shown when featured section also exists */}
-            {filters.separateFeatured && featured.length > 0 && (
-              <div className="bg-black px-[3px]">
-                <div className="bg-black flex items-center gap-4 px-5 py-3">
-                  <span className="font-black text-xs uppercase tracking-widest text-mondrian-white/50">
-                    All Certifications
-                  </span>
-                </div>
+            {/* Empty states */}
+            {certifications.length === 0 && (
+              <div className="bg-mondrian-white p-16 text-center">
+                <p className="font-black text-sm uppercase tracking-widest text-gray-400">
+                  No certifications yet.
+                </p>
               </div>
             )}
 
-            {/* Cards grid */}
-            <div className="bg-black p-[3px] pt-0 grid grid-cols-2 md:grid-cols-4 gap-0">
-              {rest.map((cert) => (
-                <CertCard
-                  key={cert.id}
-                  cert={cert}
-                  tags={tags}
-                  onClick={() => setModalCert(cert)}
-                />
-              ))}
-            </div>
-          </>
-        )}
+            {certifications.length > 0 && filtered.length === 0 && (
+              <div className="bg-mondrian-white p-16 text-center">
+                <p className="font-black text-sm uppercase tracking-widest text-gray-400">
+                  No certifications match the current filters.
+                </p>
+              </div>
+            )}
 
-        {/* ── Footer ──────────────────────────────────────────────────── */}
+            {/* Featured section */}
+            {filters.separateFeatured && featured.length > 0 && (
+              <div className="bg-black grid grid-cols-2 md:grid-cols-4 gap-[3px]">
+                {/* Section label — full width row */}
+                <div className="col-span-2 md:col-span-4 bg-black flex items-center gap-3 px-5 py-3">
+                  <span className="font-black text-xs uppercase tracking-widest text-mondrian-yellow">
+                    Featured
+                  </span>
+                  <div className="flex gap-1 items-center">
+                    <div className="h-[3px] w-4 bg-mondrian-red" />
+                    <div className="h-[3px] w-4 bg-mondrian-blue" />
+                    <div className="h-[3px] w-4 bg-mondrian-yellow" />
+                  </div>
+                </div>
+                {/* Cards */}
+                {featured.map((cert, i) => (
+                  <CertCard
+                    key={cert.id}
+                    cert={cert}
+                    tags={tags}
+                    onClick={() => setModalCert(cert)}
+                    accentColor={FEATURED_ACCENTS[i % FEATURED_ACCENTS.length]}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* All / remaining certifications */}
+            {rest.length > 0 && (
+              <div className="bg-black grid grid-cols-2 md:grid-cols-4 gap-[3px]">
+                {/* Section label — only when featured section is also showing */}
+                {filters.separateFeatured && featured.length > 0 && (
+                  <div className="col-span-2 md:col-span-4 bg-black flex items-center px-5 py-3">
+                    <span className="font-black text-xs uppercase tracking-widest text-mondrian-white/40">
+                      All Certifications
+                    </span>
+                  </div>
+                )}
+                {/* Cards */}
+                {rest.map((cert) => (
+                  <CertCard
+                    key={cert.id}
+                    cert={cert}
+                    tags={tags}
+                    onClick={() => setModalCert(cert)}
+                  />
+                ))}
+              </div>
+            )}
+
+          </div>
+        </div>
+
+        {/* ── Footer ──────────────────────────────────────────────────────── */}
         <footer className="bg-black border-t-[3px] border-mondrian-white/10 mt-[3px]">
           <div className="flex items-stretch">
             <div className="flex items-center px-5 py-4 border-r-[3px] border-mondrian-white/10 flex-1">

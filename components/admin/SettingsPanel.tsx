@@ -34,7 +34,7 @@ export default function SettingsPanel({ settings, onRefresh }: SettingsPanelProp
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-bold text-xl">Settings</h2>
+        <h2 className="font-bold text-sm uppercase tracking-widest">Settings</h2>
         {saved && (
           <span className="flex items-center gap-1 font-body text-xs text-green-600 font-semibold">
             <Check size={13} /> Saved
@@ -42,12 +42,12 @@ export default function SettingsPanel({ settings, onRefresh }: SettingsPanelProp
         )}
       </div>
 
-      <div className="border-4 border-mondrian-black">
+      <div className="bg-white border-2 border-black">
         {/* Stats toggle */}
-        <div className="flex items-center justify-between p-5 border-b-2 border-mondrian-black last:border-b-0">
+        <div className="flex items-center justify-between p-5">
           <div>
-            <p className="font-body font-semibold text-sm">Show Stats Bar</p>
-            <p className="font-body text-xs text-gray-500 mt-0.5">
+            <p className="font-semibold text-sm">Show Stats Bar</p>
+            <p className="text-xs text-gray-500 mt-0.5">
               Display total certifications, active count, and unique issuers at the top of the
               public page.
             </p>
@@ -74,7 +74,7 @@ export default function SettingsPanel({ settings, onRefresh }: SettingsPanelProp
         </div>
       </div>
 
-      <p className="font-body text-xs text-gray-400 mt-4">
+      <p className="text-xs text-gray-400 mt-4">
         More settings can be added here as the site grows.
       </p>
     </div>

@@ -84,9 +84,9 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull,
     <div>
       {/* Add/Edit form panel */}
       {formMode !== 'none' && (
-        <div className="border-4 border-mondrian-blue mb-6">
-          <div className="bg-mondrian-blue px-6 py-3">
-            <h3 className="font-display text-white font-bold">
+        <div className="bg-white border-2 border-black mb-6">
+          <div className="border-b-2 border-black px-6 py-3">
+            <h3 className="text-sm font-bold uppercase tracking-widest">
               {formMode === 'add' ? 'Add New Certification' : 'Edit Certification'}
             </h3>
           </div>
@@ -106,11 +106,9 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull,
 
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-bold text-xl">
+        <h2 className="font-bold text-sm uppercase tracking-widest">
           Certifications
-          <span className="ml-2 font-body text-sm font-normal text-gray-400">
-            ({certifications.length})
-          </span>
+          <span className="ml-2 font-normal text-gray-400">({certifications.length})</span>
         </h2>
         {formMode === 'none' && (
           <button
@@ -122,23 +120,23 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull,
         )}
       </div>
 
-      {/* List */}
+      {/* List — one white tile per certification */}
       {certifications.length === 0 ? (
-        <div className="border-4 border-dashed border-gray-200 p-12 text-center">
-          <p className="font-body text-sm text-gray-400 uppercase tracking-widest">
+        <div className="border-2 border-dashed border-gray-200 p-12 text-center bg-white">
+          <p className="text-sm text-gray-400 uppercase tracking-widest">
             No certifications yet. Add your first one above.
           </p>
         </div>
       ) : (
-        <div className="border-4 border-mondrian-black divide-y-2 divide-mondrian-black">
+        <div className="flex flex-col gap-3">
           {certifications.map((cert) => {
             const status = getExpirationStatus(cert)
             const certTags = tags.filter((t) => cert.tags.includes(t.id))
 
             return (
-              <div key={cert.id} className="flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors">
+              <div key={cert.id} className="bg-white border-2 border-black flex items-start gap-4 p-4">
                 {/* Image thumbnail */}
-                <div className="flex-shrink-0 w-16 h-12 border-2 border-mondrian-black bg-gray-100 overflow-hidden">
+                <div className="flex-shrink-0 w-16 h-12 border border-gray-200 bg-gray-100 overflow-hidden">
                   {cert.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -148,9 +146,7 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull,
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-gray-300 text-[8px] uppercase tracking-wider">
-                        No img
-                      </span>
+                      <span className="text-gray-300 text-[8px] uppercase tracking-wider">No img</span>
                     </div>
                   )}
                 </div>
@@ -159,27 +155,20 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull,
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     {cert.featured && (
-                      <Star
-                        size={12}
-                        className="text-mondrian-yellow fill-mondrian-yellow flex-shrink-0"
-                      />
+                      <Star size={12} className="text-mondrian-yellow fill-mondrian-yellow flex-shrink-0" />
                     )}
-                    <span className="font-display font-bold text-sm truncate">
-                      {cert.name}
-                    </span>
+                    <span className="font-bold text-sm truncate">{cert.name}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span className="font-body text-xs text-gray-500">{cert.issuingOrg}</span>
+                    <span className="text-xs text-gray-500">{cert.issuingOrg}</span>
                     <span className="text-gray-300">·</span>
-                    <span className="font-body text-xs text-gray-400">{formatDate(cert.issueDate)}</span>
-                    <span
-                      className={`font-body text-[10px] font-semibold px-1.5 py-px border ${STATUS_CLASSES[status]}`}
-                    >
+                    <span className="text-xs text-gray-400">{formatDate(cert.issueDate)}</span>
+                    <span className={`text-[10px] font-semibold px-1.5 py-px border ${STATUS_CLASSES[status]}`}>
                       {STATUS_LABELS[status]}
                     </span>
                   </div>
                   {certTags.length > 0 && (
-                    <div className="flex gap-1 mt-1 flex-wrap">
+                    <div className="flex gap-1 mt-1.5 flex-wrap">
                       {certTags.map((t) => (
                         <span
                           key={t.id}
