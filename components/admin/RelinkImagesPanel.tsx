@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { RefreshCw, Link, CheckCircle, AlertCircle, ChevronDown } from 'lucide-react'
+import { RefreshCw, Link2, CheckCircle, AlertCircle, ChevronDown } from 'lucide-react'
 import type { Certification, PublicCertification } from '@/lib/types'
 import type { CloudinaryAsset } from '@/app/api/admin/cloudinary-assets/route'
 import { getCloudinaryThumbnailUrl } from '@/lib/utils'
@@ -99,14 +99,6 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
     }
   }
 
-  async function applyAll() {
-    for (const cert of certsWithoutImage) {
-      if (matches[cert.id] && !saved.has(cert.id)) {
-        await applyRelink(cert)
-      }
-    }
-  }
-
   // Only show "all good" after a Cloudinary fetch has confirmed it
   if (status === 'done' && certsWithoutImage.length === 0) {
     return (
@@ -125,7 +117,6 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
     )
   }
 
-  const matchCount = certsWithoutImage.filter((c) => matches[c.id]).length
   const unlinkedAssets = assets.filter(
     (a) => !fullCerts.some((c) => c.imagePublicId === a.publicId || c.imageUrl === a.secureUrl)
   )
@@ -163,22 +154,9 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
       {status === 'done' && (
         <>
           {/* Summary */}
-          <div className="bg-white border-2 border-black p-4 mb-4 flex items-center justify-between">
-            <div className="text-sm">
-              <span className="font-semibold">{assets.length}</span>
-              <span className="text-gray-500"> assets in Cloudinary · </span>
-              <span className="font-semibold">{matchCount}</span>
-              <span className="text-gray-500"> auto-matched</span>
-            </div>
-            {matchCount > 0 && (
-              <button
-                onClick={applyAll}
-                disabled={saving !== null}
-                className="btn-primary !py-1.5 !px-3 text-xs flex items-center gap-1.5 disabled:opacity-50"
-              >
-                <Link size={11} /> Apply All Matches
-              </button>
-            )}
+          <div className="bg-white border-2 border-black p-4 mb-4">
+            <span className="font-semibold text-sm">{assets.length}</span>
+            <span className="text-sm text-gray-500"> assets found in Cloudinary</span>
           </div>
 
           {/* Certs needing images */}
@@ -273,7 +251,7 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
                         {isSaving ? (
                           <RefreshCw size={11} className="animate-spin" />
                         ) : (
-                          <Link size={11} />
+                          <Link2 size={11} />
                         )}
                         Link
                       </button>
