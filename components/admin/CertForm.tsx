@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Upload, X, Loader2, ChevronDown, Plus, FileText, Check } from 'lucide-react'
+import Toast from '@/components/Toast'
 import type { Certification, Tag } from '@/lib/types'
 
 interface CertFormProps {
@@ -277,6 +278,7 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
   const [uploadError, setUploadError] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [orphanToast, setOrphanToast] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const DRAFT_KEY = 'cert-form-draft'
@@ -345,9 +347,13 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
     try {
       const fd = new FormData()
       fd.append('file', file)
+      if (imagePublicId) fd.append('oldPublicId', imagePublicId)
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Upload failed')
+      if (data.oldImageMissing && imageUrl) {
+        setOrphanToast(`Unable to find and remove previously used image. Might be orphaned. Check Cloudinary for: ${imageUrl}`)
+      }
       setImageUrl(data.url)
       setImagePublicId(data.publicId)
       setFileType(detectedType)
@@ -655,6 +661,10 @@ export default function CertForm({ initial, tags, existingOrgs, onSave, onCancel
           Cancel
         </button>
       </div>
+
+      {orphanToast && (
+        <Toast message={orphanToast} onClose={() => setOrphanToast(null)} />
+      )}
     </form>
   )
 }
