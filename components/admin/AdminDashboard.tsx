@@ -2,19 +2,21 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { LogOut, RefreshCw } from 'lucide-react'
-import type { Certification, Tag, Settings } from '@/lib/types'
+import type { Certification, PublicCertification, Tag, Settings } from '@/lib/types'
 import CertList from './CertList'
 import SettingsPanel from './SettingsPanel'
 import SkillsModal from './SkillsModal'
+import RelinkImagesPanel from './RelinkImagesPanel'
 
 interface AdminDashboardProps {
   onLogout: () => void
 }
 
-type TabId = 'certifications' | 'settings'
+type TabId = 'certifications' | 'relink' | 'settings'
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'certifications', label: 'Certifications' },
+  { id: 'relink', label: 'Relink Images' },
   { id: 'settings', label: 'Settings' },
 ]
 
@@ -22,7 +24,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabId>('certifications')
   const [certResetKey, setCertResetKey] = useState(0)
   const [skillsModalOpen, setSkillsModalOpen] = useState(false)
-  const [certifications, setCertifications] = useState<Certification[]>([])
+  const [certifications, setCertifications] = useState<PublicCertification[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [settings, setSettings] = useState<Settings>({ showStats: true })
   const [loading, setLoading] = useState(true)
@@ -149,6 +151,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 resetKey={certResetKey}
                 onOpenSkillsModal={() => setSkillsModalOpen(true)}
               />
+            )}
+            {activeTab === 'relink' && (
+              <RelinkImagesPanel certifications={certifications} onRefresh={fetchAll} />
             )}
             {activeTab === 'settings' && (
               <SettingsPanel settings={settings} onRefresh={fetchAll} />

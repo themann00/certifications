@@ -2,12 +2,12 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { Plus, Pencil, Trash2, Star, Loader2 } from 'lucide-react'
-import type { Certification, Tag } from '@/lib/types'
+import type { Certification, PublicCertification, Tag } from '@/lib/types'
 import { formatDate, getExpirationStatus, STATUS_LABELS, STATUS_CLASSES, getCloudinaryThumbnailUrl } from '@/lib/utils'
 import CertForm from './CertForm'
 
 interface CertListProps {
-  certifications: Certification[]
+  certifications: PublicCertification[]
   tags: Tag[]
   onRefresh: () => void
   onFetchFull: (id: string) => Promise<Certification | null>
