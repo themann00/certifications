@@ -64,51 +64,59 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-mondrian-black border-b-4 border-mondrian-black sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 flex items-center justify-between h-14">
-          <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-mondrian-white">
+      {/* Header — vertical border separator pattern from jacobmann.me */}
+      <header className="bg-mondrian-black border-b-[6px] border-mondrian-black sticky top-0 z-20">
+        <div className="flex items-stretch">
+          {/* Brand */}
+          <div className="flex items-center gap-3 px-5 py-3 border-r-[6px] border-gray-700">
             <div className="flex gap-1">
-              <div className="w-3 h-3 bg-mondrian-red" />
-              <div className="w-3 h-3 bg-mondrian-blue" />
-              <div className="w-3 h-3 bg-mondrian-yellow" />
+              <div className="w-2.5 h-2.5 bg-mondrian-red" />
+              <div className="w-2.5 h-2.5 bg-mondrian-blue" />
+              <div className="w-2.5 h-2.5 bg-mondrian-yellow" />
             </div>
-            <span className="font-display text-white font-bold text-base">
-              Admin Dashboard
+            <span className="font-display text-white font-bold text-sm">
+              Admin
             </span>
             <span className="font-body text-gray-500 text-xs hidden sm:inline">
               certifications.jacobmann.me
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={fetchAll}
-              className="text-gray-400 hover:text-white transition-colors"
-              title="Refresh data"
-            >
-              <RefreshCw size={15} />
-            </button>
-            <a
-              href="/"
-              target="_blank"
-              className="font-body text-xs text-gray-400 hover:text-white uppercase tracking-widest transition-colors hidden sm:inline"
-            >
-              View Site
-            </a>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 font-body text-xs text-gray-400 hover:text-mondrian-red transition-colors uppercase tracking-widest"
-            >
-              <LogOut size={13} /> Logout
-            </button>
-          </div>
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Refresh */}
+          <button
+            onClick={fetchAll}
+            className="flex items-center px-4 border-l-[6px] border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+            title="Refresh data"
+          >
+            <RefreshCw size={15} />
+          </button>
+
+          {/* View site */}
+          <a
+            href="/"
+            target="_blank"
+            className="hidden sm:flex items-center px-5 border-l-[6px] border-gray-700 font-body text-xs text-gray-400 hover:text-white hover:bg-gray-800 uppercase tracking-widest transition-colors"
+          >
+            View Site
+          </a>
+
+          {/* Logout */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 px-5 border-l-[6px] border-gray-700 font-body text-xs text-gray-400 hover:text-mondrian-red hover:bg-gray-800 transition-colors uppercase tracking-widest"
+          >
+            <LogOut size={13} /> Logout
+          </button>
         </div>
       </header>
 
       {/* Tab bar */}
-      <div className="bg-white border-b-4 border-mondrian-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 flex">
+      <div className="bg-mondrian-white border-b-[6px] border-mondrian-black">
+        <div className="flex">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -118,15 +126,15 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 }
                 setActiveTab(tab.id)
               }}
-              className={`px-6 py-3 font-body text-xs font-semibold uppercase tracking-widest border-b-4 -mb-[4px] transition-colors ${
+              className={`px-6 py-3 font-body text-xs font-semibold uppercase tracking-widest border-b-[6px] -mb-[6px] border-r-[6px] border-r-mondrian-black transition-colors ${
                 activeTab === tab.id
-                  ? 'border-mondrian-blue text-mondrian-blue'
-                  : 'border-transparent text-gray-500 hover:text-black'
+                  ? 'border-b-mondrian-blue text-mondrian-blue bg-white'
+                  : 'border-b-transparent text-gray-500 hover:text-black hover:bg-mondrian-yellow'
               }`}
             >
               {tab.label}
               {tab.id === 'certifications' && certifications.length > 0 && (
-                <span className="ml-2 bg-gray-100 text-gray-500 text-[10px] px-1.5 py-px font-bold">
+                <span className="ml-2 bg-gray-200 text-gray-500 text-[10px] px-1.5 py-px font-bold">
                   {certifications.length}
                 </span>
               )}
@@ -136,11 +144,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           {/* Skills — opens modal */}
           <button
             onClick={() => setSkillsModalOpen(true)}
-            className="px-6 py-3 font-body text-xs font-semibold uppercase tracking-widest border-b-4 border-transparent -mb-[4px] text-gray-500 hover:text-black transition-colors"
+            className="px-6 py-3 font-body text-xs font-semibold uppercase tracking-widest border-b-[6px] border-b-transparent border-r-[6px] border-r-mondrian-black -mb-[6px] text-gray-500 hover:text-black hover:bg-mondrian-yellow transition-colors"
           >
             Skills
             {tags.length > 0 && (
-              <span className="ml-2 bg-gray-100 text-gray-500 text-[10px] px-1.5 py-px font-bold">
+              <span className="ml-2 bg-gray-200 text-gray-500 text-[10px] px-1.5 py-px font-bold">
                 {tags.length}
               </span>
             )}

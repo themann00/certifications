@@ -37,16 +37,17 @@ export default function AdminLogin({ onSuccess }: AdminLoginProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      {/* Mondrian accent blocks */}
-      <div className="fixed top-0 left-0 w-3 h-full bg-mondrian-black pointer-events-none" />
-      <div className="fixed top-0 left-3 w-12 h-32 bg-mondrian-red pointer-events-none" />
-      <div className="fixed bottom-0 right-0 w-3 h-full bg-mondrian-black pointer-events-none" />
-      <div className="fixed bottom-0 right-3 w-20 h-20 bg-mondrian-blue pointer-events-none" />
-      <div className="fixed top-0 right-16 w-16 h-4 bg-mondrian-yellow pointer-events-none" />
+    <div className="min-h-screen bg-mondrian-white flex items-center justify-center p-4">
+      {/* Mondrian accent blocks — matches jacobmann.me decorative corner pattern */}
+      <div className="fixed top-0 left-0 w-[6px] h-full bg-mondrian-black pointer-events-none" />
+      <div className="fixed top-0 left-[6px] w-14 h-36 bg-mondrian-red pointer-events-none" />
+      <div className="fixed bottom-0 right-0 w-[6px] h-full bg-mondrian-black pointer-events-none" />
+      <div className="fixed bottom-0 right-[6px] w-24 h-24 bg-mondrian-blue pointer-events-none" />
+      <div className="fixed top-0 right-20 w-20 h-[6px] bg-mondrian-black pointer-events-none" />
+      <div className="fixed top-[6px] right-20 w-20 h-10 bg-mondrian-yellow pointer-events-none" />
 
       <div className="w-full max-w-sm">
-        <div className="border-4 border-mondrian-black">
+        <div className="border-[6px] border-mondrian-black">
           {/* Header */}
           <div className="bg-mondrian-black px-6 py-5 flex items-center gap-3">
             <Lock size={18} className="text-mondrian-yellow" />

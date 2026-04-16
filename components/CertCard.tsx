@@ -35,15 +35,17 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
   const thumbnailUrl = cert.imageUrl ? getCloudinaryThumbnailUrl(cert.imageUrl, 400, 280, isPdf) : null
   const accent = accentColor ?? 'bg-mondrian-black'
 
+  const accentText = accent === 'bg-mondrian-yellow' ? 'text-mondrian-black' : 'text-white'
+
   return (
-    <div className="cert-card border-4 border-mondrian-black bg-white flex flex-col">
+    <div className="cert-card group border-4 border-mondrian-black bg-mondrian-white flex flex-col">
       {/* Accent bar */}
       <div className={`h-1.5 ${accent}`} />
 
-      {/* Thumbnail — clickable */}
+      {/* Thumbnail — clickable, sliding color bar on hover (parent site portfolio pattern) */}
       <button
         onClick={onClick}
-        className="block overflow-hidden border-b-4 border-mondrian-black bg-gray-50 relative w-full"
+        className="block overflow-hidden border-b-4 border-mondrian-black bg-gray-100 relative w-full"
         style={{ height: 180 }}
         aria-label={`View ${cert.name} certificate image`}
       >
@@ -54,10 +56,10 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
             src={thumbnailUrl}
             alt={cert.name}
             onError={() => setPdfThumbError(true)}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : isPdf ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-100">
             <FileText size={36} className="text-mondrian-red" />
             <span className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-400">
               PDF
@@ -68,16 +70,25 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
             src={thumbnailUrl}
             alt={cert.name}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <span className="text-gray-300 font-body text-xs tracking-widest uppercase">
               No Image
             </span>
           </div>
         )}
+
+        {/* Sliding color bar — parent site PortfolioCategoryCard pattern */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 ${accent} translate-y-full group-hover:translate-y-0 transition-transform duration-300 py-2 px-3 flex items-center justify-center`}
+        >
+          <span className={`font-body text-[10px] font-black uppercase tracking-widest ${accentText}`}>
+            View Certificate
+          </span>
+        </div>
       </button>
 
       {/* Body */}

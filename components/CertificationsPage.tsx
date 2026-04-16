@@ -64,25 +64,31 @@ export default function CertificationsPage({
     <>
       <MondrianBackground />
 
-      <div className="relative z-10 min-h-screen bg-white/85 backdrop-blur-sm">
-        {/* Header */}
-        <header className="border-b-4 border-mondrian-black bg-mondrian-white/95 backdrop-blur-sm sticky top-0 z-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <a
-                href="https://jacobmann.me"
-                className="font-display font-bold text-xl tracking-tight text-mondrian-black hover:text-mondrian-blue transition-colors"
-              >
-                JACOB MANN
-              </a>
-              <span className="w-px h-5 bg-mondrian-black" />
-              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
+      <div className="relative z-10 min-h-screen bg-mondrian-white/85 backdrop-blur-sm">
+        {/* Header — matches jacobmann.me sticky nav pattern */}
+        <header className="border-b-[6px] border-mondrian-black bg-mondrian-white/95 backdrop-blur-sm sticky top-0 z-20">
+          <div className="flex items-stretch">
+            {/* Logo */}
+            <a
+              href="https://jacobmann.me"
+              className="flex items-center gap-3 px-5 py-3 border-r-[6px] border-mondrian-black hover:bg-mondrian-yellow transition-colors duration-200"
+            >
+              <span className="font-display font-bold text-base tracking-tight text-mondrian-black uppercase">
+                Jacob Mann
+              </span>
+            </a>
+
+            {/* Breadcrumb */}
+            <div className="flex items-center px-5 border-r-[6px] border-mondrian-black flex-1">
+              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
                 Certifications
               </span>
             </div>
+
+            {/* Admin link — muted, stays out of the way */}
             <a
               href="/admin"
-              className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-300 hover:text-gray-500 transition-colors"
+              className="flex items-center px-5 font-body text-[10px] font-semibold uppercase tracking-widest text-gray-300 hover:text-mondrian-black hover:bg-mondrian-yellow transition-colors duration-200"
             >
               admin
             </a>
@@ -113,14 +119,14 @@ export default function CertificationsPage({
           />
 
           {certifications.length === 0 ? (
-            <div className="border-4 border-mondrian-black bg-white/90 backdrop-blur-sm p-16 text-center">
+            <div className="border-4 border-mondrian-black bg-mondrian-white/90 backdrop-blur-sm p-16 text-center">
               <Award size={48} className="mx-auto mb-4 text-gray-200" />
               <p className="font-display text-2xl font-bold text-gray-300">
                 No certifications yet
               </p>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="border-4 border-mondrian-black bg-white/90 backdrop-blur-sm p-16 text-center">
+            <div className="border-4 border-mondrian-black bg-mondrian-white/90 backdrop-blur-sm p-16 text-center">
               <p className="font-body text-sm text-gray-400 uppercase tracking-widest">
                 No certifications match the current filters.
               </p>
@@ -182,16 +188,18 @@ export default function CertificationsPage({
         </main>
 
         {/* Footer */}
-        <footer className="border-t-4 border-mondrian-black mt-16 bg-mondrian-white/90 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 flex items-center justify-between">
-            <span className="font-body text-xs text-gray-400 uppercase tracking-widest">
-              © {new Date().getFullYear()} Jacob Mann
-            </span>
+        <footer className="border-t-[6px] border-mondrian-black mt-16 bg-mondrian-white/95 backdrop-blur-sm">
+          <div className="flex items-stretch">
+            <div className="flex items-center px-5 py-4 border-r-[6px] border-mondrian-black flex-1">
+              <span className="font-body text-xs text-gray-400 uppercase tracking-widest">
+                © {new Date().getFullYear()} Jacob Mann
+              </span>
+            </div>
             <a
               href="https://jacobmann.me"
-              className="font-body text-xs font-semibold uppercase tracking-widest text-mondrian-black hover:text-mondrian-blue transition-colors"
+              className="flex items-center px-5 py-4 font-body text-xs font-semibold uppercase tracking-widest text-mondrian-black hover:bg-mondrian-yellow transition-colors duration-200"
             >
-              jacobmann.me
+              jacobmann.me →
             </a>
           </div>
         </footer>

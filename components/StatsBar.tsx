@@ -19,12 +19,12 @@ export default function StatsBar({ certifications }: StatsBarProps) {
   ]
 
   return (
-    <div className="grid grid-cols-3 gap-0 border-4 border-mondrian-black mb-8">
+    <div className="grid grid-cols-3 gap-0 border-[6px] border-mondrian-black mb-8">
       {stats.map((stat, i) => (
         <div
           key={stat.label}
-          className={`relative bg-white/90 backdrop-blur-sm p-6 text-center ${
-            i < stats.length - 1 ? 'border-r-4 border-mondrian-black' : ''
+          className={`relative bg-mondrian-white/90 backdrop-blur-sm p-6 text-center ${
+            i < stats.length - 1 ? 'border-r-[6px] border-mondrian-black' : ''
           }`}
         >
           <div

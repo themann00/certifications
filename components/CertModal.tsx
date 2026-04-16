@@ -30,11 +30,11 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
       onClick={onClose}
     >
       <div
-        className="relative bg-white border-4 border-mondrian-black max-w-3xl w-full max-h-[90vh] overflow-auto"
+        className="relative bg-mondrian-white border-[6px] border-mondrian-black max-w-3xl w-full max-h-[90vh] overflow-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar */}
-        <div className="flex items-center justify-between border-b-4 border-mondrian-black px-6 py-4 bg-mondrian-black">
+        <div className="flex items-center justify-between border-b-[6px] border-mondrian-black px-6 py-4 bg-mondrian-black">
           <span className="font-display text-white font-bold text-lg truncate pr-4">
             {cert.name}
           </span>
@@ -49,7 +49,7 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
 
         {/* Image or PDF */}
         {cert.fileType === 'pdf' && cert.imageUrl ? (
-          <div className="border-b-4 border-mondrian-black flex flex-col">
+          <div className="border-b-[6px] border-mondrian-black flex flex-col">
             {/* Render page 1 as an image — avoids iframe embedding/CORS issues */}
             <img
               src={getCloudinaryThumbnailUrl(cert.imageUrl, 900, 1200, true)}
@@ -71,7 +71,7 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
             </div>
           </div>
         ) : cert.imageUrl ? (
-          <div className="border-b-4 border-mondrian-black">
+          <div className="border-b-[6px] border-mondrian-black">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={cert.imageUrl}
@@ -80,7 +80,7 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
             />
           </div>
         ) : (
-          <div className="border-b-4 border-mondrian-black bg-gray-50 flex items-center justify-center h-64">
+          <div className="border-b-[6px] border-mondrian-black bg-gray-100 flex items-center justify-center h-64">
             <span className="text-gray-400 font-body text-sm tracking-widest uppercase">
               No Image
             </span>
@@ -106,7 +106,7 @@ export default function CertModal({ cert, onClose }: CertModalProps) {
               href={cert.linkUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-3 border-2 border-mondrian-black px-4 py-2 font-body text-xs font-semibold uppercase tracking-widest hover:bg-mondrian-black hover:text-white transition-colors"
+              className="inline-block mt-3 border-2 border-mondrian-black px-4 py-2 font-body text-xs font-semibold uppercase tracking-widest hover:bg-mondrian-blue hover:border-mondrian-blue hover:text-white transition-colors duration-200"
             >
               {cert.linkType === 'my_cert' ? 'View My Credential →' : 'Learn More →'}
             </a>

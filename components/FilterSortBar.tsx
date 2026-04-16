@@ -79,18 +79,18 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
   ]
 
   return (
-    <div className="border-4 border-mondrian-black bg-white/95 backdrop-blur-sm mb-8">
+    <div className="border-[6px] border-mondrian-black bg-mondrian-white/95 backdrop-blur-sm mb-8">
       {/* Top row */}
-      <div className="flex items-center gap-0 border-b-4 border-mondrian-black">
+      <div className="flex items-center gap-0 border-b-[6px] border-mondrian-black">
         {/* Featured toggle */}
         <button
           onClick={() =>
             onChange({ ...filters, separateFeatured: !filters.separateFeatured })
           }
-          className={`flex items-center gap-2 px-4 py-3 border-r-4 border-mondrian-black font-body text-xs font-semibold uppercase tracking-widest transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 border-r-[6px] border-mondrian-black font-body text-xs font-semibold uppercase tracking-widest transition-colors ${
             filters.separateFeatured
               ? 'bg-mondrian-black text-white'
-              : 'bg-white text-mondrian-black hover:bg-gray-50'
+              : 'bg-mondrian-white text-mondrian-black hover:bg-mondrian-yellow'
           }`}
         >
           <span
@@ -102,7 +102,7 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
         </button>
 
         {/* Sort */}
-        <div className="flex items-center gap-0 border-r-4 border-mondrian-black px-4 py-3 flex-1">
+        <div className="flex items-center gap-0 border-r-[6px] border-mondrian-black px-4 py-3 flex-1">
           <span className="font-body text-xs text-gray-400 uppercase tracking-widest mr-3 hidden sm:block">
             Sort
           </span>
@@ -114,7 +114,7 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
                 className={`px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider border-2 transition-colors ${
                   filters.sortBy === opt.value
                     ? 'bg-mondrian-black text-white border-mondrian-black'
-                    : 'bg-white text-black border-mondrian-black hover:bg-gray-50'
+                    : 'bg-mondrian-white text-black border-mondrian-black hover:bg-mondrian-yellow'
                 }`}
               >
                 {opt.label}
@@ -128,7 +128,7 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
           onClick={() =>
             onChange({ ...filters, sortDir: filters.sortDir === 'desc' ? 'asc' : 'desc' })
           }
-          className="px-4 py-3 border-r-4 border-mondrian-black font-body text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center gap-1"
+          className="px-4 py-3 border-r-[6px] border-mondrian-black font-body text-xs font-semibold hover:bg-mondrian-yellow transition-colors flex items-center gap-1"
           title={filters.sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
         >
           {filters.sortDir === 'desc' ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
@@ -141,7 +141,7 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
         <button
           onClick={() => setShowFilters((v) => !v)}
           className={`flex items-center gap-2 px-4 py-3 font-body text-xs font-semibold uppercase tracking-widest transition-colors ${
-            showFilters ? 'bg-mondrian-black text-white' : 'bg-white text-mondrian-black hover:bg-gray-50'
+            showFilters ? 'bg-mondrian-black text-white' : 'bg-mondrian-white text-mondrian-black hover:bg-mondrian-yellow'
           }`}
         >
           <SlidersHorizontal size={14} />
@@ -170,7 +170,7 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
                   className={`font-body text-xs font-semibold px-3 py-1 border-2 uppercase tracking-wider transition-colors ${
                     filters.selectedStatuses.includes(s)
                       ? STATUS_ACTIVE_CLASSES[s]
-                      : 'bg-white text-black border-black hover:bg-gray-50'
+                      : 'bg-mondrian-white text-black border-black hover:bg-mondrian-yellow'
                   }`}
                 >
                   {STATUS_LABELS[s]}
@@ -217,7 +217,7 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
                     className={`font-body text-xs font-semibold px-3 py-1 border-2 border-mondrian-black uppercase tracking-wider transition-colors ${
                       filters.selectedOrgs.includes(org)
                         ? 'bg-mondrian-black text-white'
-                        : 'bg-white text-mondrian-black hover:bg-gray-50'
+                        : 'bg-mondrian-white text-mondrian-black hover:bg-mondrian-yellow'
                     }`}
                   >
                     {org}
