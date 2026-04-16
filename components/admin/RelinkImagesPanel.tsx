@@ -290,11 +290,25 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">
                 {unlinkedAssets.length} Cloudinary asset{unlinkedAssets.length !== 1 ? 's' : ''} not linked to any cert
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3 mt-3">
                 {unlinkedAssets.map((a) => (
-                  <span key={a.publicId} className="text-[10px] bg-gray-100 border border-gray-200 px-2 py-1 font-mono">
-                    {a.publicId.replace('jacobmann-me-certifications/', '')}
-                  </span>
+                  <div key={a.publicId} className="flex flex-col gap-1 w-24">
+                    <div className="w-24 h-16 border border-gray-200 bg-gray-100 overflow-hidden flex-shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={
+                          a.resourceType === 'raw'
+                            ? getCloudinaryThumbnailUrl(a.secureUrl, 96, 64, true) ?? a.secureUrl
+                            : getCloudinaryThumbnailUrl(a.secureUrl, 96, 64) ?? a.secureUrl
+                        }
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-[10px] text-gray-500 font-mono break-all leading-tight">
+                      {a.publicId.replace('jacobmann-me-certifications/', '')}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>
