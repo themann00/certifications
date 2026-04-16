@@ -19,10 +19,10 @@ const TAG_ACCENT: Record<string, string> = {
   black: 'bg-mondrian-black text-white border-mondrian-black',
 }
 const TAG_INACTIVE: Record<string, string> = {
-  red: 'bg-white text-mondrian-red border-mondrian-red',
-  blue: 'bg-white text-mondrian-blue border-mondrian-blue',
-  yellow: 'bg-white text-black border-black',
-  black: 'bg-white text-mondrian-black border-mondrian-black',
+  red: 'bg-mondrian-white text-mondrian-red border-mondrian-red',
+  blue: 'bg-mondrian-white text-mondrian-blue border-mondrian-blue',
+  yellow: 'bg-mondrian-white text-black border-black',
+  black: 'bg-mondrian-white text-mondrian-black border-mondrian-black',
 }
 
 const ALL_STATUSES: ExpirationStatus[] = ['active', 'expires_soon', 'expired', 'no_expiration']
@@ -75,35 +75,35 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
   const sortOptions: { value: SortBy; label: string }[] = [
     { value: 'date', label: 'Date' },
     { value: 'name', label: 'Name' },
-    { value: 'org', label: 'Organization' },
+    { value: 'org', label: 'Org' },
   ]
 
   return (
-    <div className="border-[6px] border-mondrian-black bg-mondrian-white/95 backdrop-blur-sm mb-8">
+    // No outer border — sits inside bg-black p-[3px] wrapper which provides the border
+    <div className="bg-mondrian-white">
       {/* Top row */}
-      <div className="flex items-center gap-0 border-b-[6px] border-mondrian-black">
+      <div className="flex items-center gap-0 border-b-[3px] border-black">
+
         {/* Featured toggle */}
         <button
-          onClick={() =>
-            onChange({ ...filters, separateFeatured: !filters.separateFeatured })
-          }
-          className={`flex items-center gap-2 px-4 py-3 border-r-[6px] border-mondrian-black font-body text-xs font-semibold uppercase tracking-widest transition-colors ${
+          onClick={() => onChange({ ...filters, separateFeatured: !filters.separateFeatured })}
+          className={`flex items-center gap-2 px-4 py-3 border-r-[3px] border-black font-black text-xs uppercase tracking-widest transition-colors ${
             filters.separateFeatured
-              ? 'bg-mondrian-black text-white'
-              : 'bg-mondrian-white text-mondrian-black hover:bg-mondrian-yellow'
+              ? 'bg-black text-white'
+              : 'bg-mondrian-white text-black hover:bg-mondrian-yellow'
           }`}
         >
           <span
-            className={`w-2 h-2 border-2 ${
+            className={`w-2 h-2 border-2 flex-shrink-0 ${
               filters.separateFeatured ? 'bg-mondrian-yellow border-mondrian-yellow' : 'border-black'
             }`}
           />
-          Featured First
+          <span className="hidden sm:inline">Featured First</span>
         </button>
 
-        {/* Sort */}
-        <div className="flex items-center gap-0 border-r-[6px] border-mondrian-black px-4 py-3 flex-1">
-          <span className="font-body text-xs text-gray-400 uppercase tracking-widest mr-3 hidden sm:block">
+        {/* Sort buttons */}
+        <div className="flex items-center gap-0 border-r-[3px] border-black px-4 py-3 flex-1">
+          <span className="font-black text-[10px] text-gray-400 uppercase tracking-widest mr-3 hidden md:block">
             Sort
           </span>
           <div className="flex gap-1">
@@ -111,10 +111,10 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
               <button
                 key={opt.value}
                 onClick={() => onChange({ ...filters, sortBy: opt.value })}
-                className={`px-3 py-1 font-body text-xs font-semibold uppercase tracking-wider border-2 transition-colors ${
+                className={`px-3 py-1 font-black text-[10px] uppercase tracking-wider border-2 transition-colors ${
                   filters.sortBy === opt.value
-                    ? 'bg-mondrian-black text-white border-mondrian-black'
-                    : 'bg-mondrian-white text-black border-mondrian-black hover:bg-mondrian-yellow'
+                    ? 'bg-black text-white border-black'
+                    : 'bg-mondrian-white text-black border-black hover:bg-mondrian-yellow'
                 }`}
               >
                 {opt.label}
@@ -125,13 +125,11 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
 
         {/* Sort direction */}
         <button
-          onClick={() =>
-            onChange({ ...filters, sortDir: filters.sortDir === 'desc' ? 'asc' : 'desc' })
-          }
-          className="px-4 py-3 border-r-[6px] border-mondrian-black font-body text-xs font-semibold hover:bg-mondrian-yellow transition-colors flex items-center gap-1"
+          onClick={() => onChange({ ...filters, sortDir: filters.sortDir === 'desc' ? 'asc' : 'desc' })}
+          className="px-4 py-3 border-r-[3px] border-black font-black text-[10px] hover:bg-mondrian-yellow transition-colors flex items-center gap-1"
           title={filters.sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
         >
-          {filters.sortDir === 'desc' ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+          {filters.sortDir === 'desc' ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
           <span className="hidden sm:inline uppercase tracking-widest">
             {filters.sortDir === 'desc' ? 'Desc' : 'Asc'}
           </span>
@@ -140,14 +138,14 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
         {/* Filter toggle */}
         <button
           onClick={() => setShowFilters((v) => !v)}
-          className={`flex items-center gap-2 px-4 py-3 font-body text-xs font-semibold uppercase tracking-widest transition-colors ${
-            showFilters ? 'bg-mondrian-black text-white' : 'bg-mondrian-white text-mondrian-black hover:bg-mondrian-yellow'
+          className={`flex items-center gap-2 px-4 py-3 font-black text-[10px] uppercase tracking-widest transition-colors ${
+            showFilters ? 'bg-black text-white' : 'bg-mondrian-white text-black hover:bg-mondrian-yellow'
           }`}
         >
-          <SlidersHorizontal size={14} />
+          <SlidersHorizontal size={13} />
           <span className="hidden sm:inline">Filters</span>
           {activeFilterCount > 0 && (
-            <span className="bg-mondrian-red text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center">
+            <span className="bg-mondrian-red text-white text-[9px] font-black w-4 h-4 flex items-center justify-center">
               {activeFilterCount}
             </span>
           )}
@@ -156,18 +154,17 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
 
       {/* Expanded filter panel */}
       {showFilters && (
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 border-t-0">
+
           {/* Status */}
           <div>
-            <div className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">
-              Status
-            </div>
+            <div className="font-black text-[9px] uppercase tracking-widest text-gray-400 mb-2">Status</div>
             <div className="flex flex-wrap gap-2">
               {ALL_STATUSES.map((s) => (
                 <button
                   key={s}
                   onClick={() => toggleStatus(s)}
-                  className={`font-body text-xs font-semibold px-3 py-1 border-2 uppercase tracking-wider transition-colors ${
+                  className={`font-black text-[10px] px-3 py-1 border-2 uppercase tracking-wider transition-colors ${
                     filters.selectedStatuses.includes(s)
                       ? STATUS_ACTIVE_CLASSES[s]
                       : 'bg-mondrian-white text-black border-black hover:bg-mondrian-yellow'
@@ -182,18 +179,14 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
           {/* Skills */}
           {tags.length > 0 && (
             <div>
-              <div className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">
-                Skills
-              </div>
+              <div className="font-black text-[9px] uppercase tracking-widest text-gray-400 mb-2">Skills</div>
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <button
                     key={tag.id}
                     onClick={() => toggleTag(tag.id)}
-                    className={`font-body text-xs font-semibold px-3 py-1 border-2 uppercase tracking-wider transition-colors ${
-                      filters.selectedTags.includes(tag.id)
-                        ? TAG_ACCENT[tag.color]
-                        : TAG_INACTIVE[tag.color]
+                    className={`font-black text-[10px] px-3 py-1 border-2 uppercase tracking-wider transition-colors ${
+                      filters.selectedTags.includes(tag.id) ? TAG_ACCENT[tag.color] : TAG_INACTIVE[tag.color]
                     }`}
                   >
                     {tag.name}
@@ -206,18 +199,16 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
           {/* Organizations */}
           {orgs.length > 0 && (
             <div>
-              <div className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">
-                Issuing Organization
-              </div>
+              <div className="font-black text-[9px] uppercase tracking-widest text-gray-400 mb-2">Issuing Org</div>
               <div className="flex flex-wrap gap-2">
                 {orgs.map((org) => (
                   <button
                     key={org}
                     onClick={() => toggleOrg(org)}
-                    className={`font-body text-xs font-semibold px-3 py-1 border-2 border-mondrian-black uppercase tracking-wider transition-colors ${
+                    className={`font-black text-[10px] px-3 py-1 border-2 border-black uppercase tracking-wider transition-colors ${
                       filters.selectedOrgs.includes(org)
-                        ? 'bg-mondrian-black text-white'
-                        : 'bg-mondrian-white text-mondrian-black hover:bg-mondrian-yellow'
+                        ? 'bg-black text-white'
+                        : 'bg-mondrian-white text-black hover:bg-mondrian-yellow'
                     }`}
                   >
                     {org}
@@ -231,9 +222,9 @@ export default function FilterSortBar({ filters, onChange, tags, orgs }: FilterS
           {activeFilterCount > 0 && (
             <button
               onClick={clearAll}
-              className="flex items-center gap-1 font-body text-xs text-mondrian-red font-semibold uppercase tracking-wider hover:underline"
+              className="flex items-center gap-1 font-black text-[10px] text-mondrian-red uppercase tracking-wider hover:underline"
             >
-              <X size={12} /> Clear All Filters
+              <X size={11} /> Clear All
             </button>
           )}
         </div>

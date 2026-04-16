@@ -31,61 +31,57 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
   const status = getExpirationStatus(cert)
   const certTags = tags.filter((t) => cert.tags.includes(t.id))
   const isPdf = cert.fileType === 'pdf'
-  // For PDFs: use Cloudinary's page-1 JPEG transformation as the thumbnail
   const thumbnailUrl = cert.imageUrl ? getCloudinaryThumbnailUrl(cert.imageUrl, 400, 280, isPdf) : null
   const accent = accentColor ?? 'bg-mondrian-black'
-
-  const accentText = accent === 'bg-mondrian-yellow' ? 'text-mondrian-black' : 'text-white'
+  const accentText = accent === 'bg-mondrian-yellow' ? 'text-black' : 'text-white'
 
   return (
-    <div className="cert-card group border-4 border-mondrian-black bg-mondrian-white flex flex-col">
-      {/* Accent bar */}
-      <div className={`h-1.5 ${accent}`} />
+    // No outer border — the bg-black p-[3px] grid in CertificationsPage provides it
+    // group enables the sliding color bar + image zoom on hover
+    <div className="group bg-mondrian-white flex flex-col h-full">
 
-      {/* Thumbnail — clickable, sliding color bar on hover (parent site portfolio pattern) */}
+      {/* Accent bar — top color strip */}
+      <div className={`h-1.5 ${accent} flex-shrink-0`} />
+
+      {/* Thumbnail — image area with sliding color bar on hover */}
       <button
         onClick={onClick}
-        className="block overflow-hidden border-b-4 border-mondrian-black bg-gray-100 relative w-full"
+        className="block overflow-hidden border-b-[3px] border-black bg-gray-100 relative w-full flex-shrink-0"
         style={{ height: 180 }}
         aria-label={`View ${cert.name} certificate image`}
       >
         {isPdf && thumbnailUrl && !pdfThumbError ? (
-          // Cloudinary renders page 1 of the PDF as a JPEG — use plain img for onError fallback
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={thumbnailUrl}
             alt={cert.name}
             onError={() => setPdfThumbError(true)}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : isPdf ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-100">
             <FileText size={36} className="text-mondrian-red" />
-            <span className="font-body text-[10px] font-semibold uppercase tracking-widest text-gray-400">
-              PDF
-            </span>
+            <span className="font-black text-[10px] uppercase tracking-widest text-gray-400">PDF</span>
           </div>
         ) : thumbnailUrl ? (
           <Image
             src={thumbnailUrl}
             alt={cert.name}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            sizes="(max-width: 768px) 50vw, 25vw"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-            <span className="text-gray-300 font-body text-xs tracking-widest uppercase">
-              No Image
-            </span>
+            <span className="text-gray-300 font-black text-xs tracking-widest uppercase">No Image</span>
           </div>
         )}
 
-        {/* Sliding color bar — parent site PortfolioCategoryCard pattern */}
+        {/* Sliding color bar — portfolio card pattern from jacobmann.me */}
         <div
           className={`absolute bottom-0 left-0 right-0 ${accent} translate-y-full group-hover:translate-y-0 transition-transform duration-300 py-2 px-3 flex items-center justify-center`}
         >
-          <span className={`font-body text-[10px] font-black uppercase tracking-widest ${accentText}`}>
+          <span className={`font-black text-[10px] uppercase tracking-widest ${accentText}`}>
             View Certificate
           </span>
         </div>
@@ -94,30 +90,30 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
       {/* Body */}
       <div className="p-4 flex flex-col flex-1 gap-2">
         <div>
-          <h3 className="font-display font-bold text-base leading-tight text-mondrian-black">
+          <h3 className="font-black text-sm leading-tight text-black uppercase tracking-tight">
             {cert.name}
           </h3>
-          <p className="font-body text-xs font-medium text-gray-500 mt-0.5 uppercase tracking-wider">
+          <p className="font-black text-[10px] text-gray-500 mt-0.5 uppercase tracking-wider">
             {cert.issuingOrg}
           </p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-body text-xs text-gray-400">
+          <span className="font-black text-xs text-gray-400">
             {formatDate(cert.issueDate)}
           </span>
           <span
-            className={`font-body text-xs font-semibold px-2 py-0.5 border-2 ${STATUS_CLASSES[status]}`}
+            className={`font-black text-[10px] px-2 py-0.5 border-2 ${STATUS_CLASSES[status]}`}
           >
             {STATUS_LABELS[status]}
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-1 min-h-[22px]">
+        <div className="flex flex-wrap gap-1 min-h-[20px]">
           {certTags.map((tag) => (
             <span
               key={tag.id}
-              className={`font-body text-[10px] font-semibold px-1.5 py-0.5 uppercase tracking-wider ${
+              className={`font-black text-[9px] px-1.5 py-0.5 uppercase tracking-wider ${
                 TAG_COLOR_CLASSES[tag.color] ?? TAG_COLOR_CLASSES.black
               }`}
             >
@@ -126,20 +122,18 @@ export default function CertCard({ cert, tags, onClick, accentColor }: CertCardP
           ))}
         </div>
 
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Link */}
         {cert.linkUrl && cert.linkType !== 'hidden' && (
           <a
             href={cert.linkUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 font-body text-xs font-semibold uppercase tracking-wider text-mondrian-black hover:text-mondrian-blue transition-colors self-end"
+            className="flex items-center gap-1 font-black text-[10px] uppercase tracking-wider text-black hover:text-mondrian-blue transition-colors self-end"
           >
             {cert.linkType === 'my_cert' ? 'My Credential' : 'Learn More'}
-            <ExternalLink size={11} />
+            <ExternalLink size={10} />
           </a>
         )}
       </div>

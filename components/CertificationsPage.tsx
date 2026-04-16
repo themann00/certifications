@@ -2,13 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import type { PublicCertification, Tag, Settings, FilterState } from '@/lib/types'
-import { filterCertifications, sortCertifications } from '@/lib/utils'
-import MondrianBackground from './MondrianBackground'
-import StatsBar from './StatsBar'
+import { filterCertifications, sortCertifications, getExpirationStatus } from '@/lib/utils'
 import FilterSortBar from './FilterSortBar'
 import CertCard from './CertCard'
 import CertModal from './CertModal'
-import { Award } from 'lucide-react'
 
 interface CertificationsPageProps {
   certifications: PublicCertification[]
@@ -60,149 +57,195 @@ export default function CertificationsPage({
     return { featured: [], rest: sorted }
   }, [filtered, filters])
 
+  // Stats for the hero grid
+  const total = certifications.length
+  const active = certifications.filter(
+    (c) => getExpirationStatus(c) === 'active' || getExpirationStatus(c) === 'no_expiration'
+  ).length
+  const issuers = new Set(certifications.map((c) => c.issuingOrg)).size
+
   return (
     <>
-      <MondrianBackground />
+      {/* Solid black page — Mondrian grid fills left to right, top to bottom */}
+      <div className="min-h-screen bg-black">
 
-      <div className="relative z-10 min-h-screen bg-mondrian-white/85 backdrop-blur-sm">
-        {/* Header — matches jacobmann.me sticky nav pattern */}
-        <header className="border-b-[6px] border-mondrian-black bg-mondrian-white/95 backdrop-blur-sm sticky top-0 z-20">
+        {/* ── Header ─────────────────────────────────────────────────────
+            Vertical border separator pattern from jacobmann.me SiteNav   */}
+        <header className="bg-black border-b-[3px] border-mondrian-white/10 sticky top-0 z-20">
           <div className="flex items-stretch">
-            {/* Logo */}
             <a
               href="https://jacobmann.me"
-              className="flex items-center gap-3 px-5 py-3 border-r-[6px] border-mondrian-black hover:bg-mondrian-yellow transition-colors duration-200"
+              className="flex items-center px-5 py-3 border-r-[3px] border-mondrian-white/10 hover:bg-mondrian-yellow transition-colors duration-200 group"
             >
-              <span className="font-display font-bold text-base tracking-tight text-mondrian-black uppercase">
+              <span className="font-black text-sm tracking-tight text-mondrian-white uppercase group-hover:text-black">
                 Jacob Mann
               </span>
             </a>
-
-            {/* Breadcrumb */}
-            <div className="flex items-center px-5 border-r-[6px] border-mondrian-black flex-1">
-              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+            <div className="flex items-center px-5 border-r-[3px] border-mondrian-white/10 flex-1">
+              <span className="font-black text-xs uppercase tracking-[0.2em] text-mondrian-white/40">
                 Certifications
               </span>
             </div>
-
-            {/* Admin link — muted, stays out of the way */}
             <a
               href="/admin"
-              className="flex items-center px-5 font-body text-[10px] font-semibold uppercase tracking-widest text-gray-300 hover:text-mondrian-black hover:bg-mondrian-yellow transition-colors duration-200"
+              className="flex items-center px-5 font-black text-[10px] uppercase tracking-widest text-mondrian-white/20 hover:text-black hover:bg-mondrian-yellow transition-colors duration-200"
             >
               admin
             </a>
           </div>
         </header>
 
-        {/* Main content */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-8 py-10">
-          {/* Stats */}
-          {settings.showStats && certifications.length > 0 && (
-            <StatsBar certifications={certifications} />
-          )}
+        {/* ── Hero grid — Title + Stats ───────────────────────────────
+            bg-black + p-[3px]: black bleeds through as borders (jacobmann.me pattern) */}
+        <div className="bg-black p-[3px] grid grid-cols-2 md:grid-cols-4 gap-0">
 
-          {/* Hero title */}
-          <div className="mb-8">
-            <h1 className="font-display text-5xl sm:text-7xl font-black text-mondrian-black leading-none tracking-tight">
-              CREDENTIALS
+          {/* Title block */}
+          <div className="col-span-2 md:col-span-3 bg-mondrian-white flex items-end p-6 md:p-10 min-h-[160px]">
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-black leading-none uppercase tracking-tight">
+              Credentials
             </h1>
-            <div className="h-1.5 bg-mondrian-red w-24 mt-3" />
           </div>
 
-          {/* Filter / Sort bar */}
+          {/* Red stat — Total */}
+          {settings.showStats && total > 0 ? (
+            <div className="bg-mondrian-red flex flex-col items-center justify-center py-8 text-center col-span-1 md:col-span-1 row-span-1">
+              <div className="text-4xl md:text-6xl font-black text-white leading-none">{total}</div>
+              <div className="text-white text-[10px] font-black uppercase tracking-widest mt-2">Total</div>
+            </div>
+          ) : (
+            <div className="bg-mondrian-red col-span-1 md:col-span-1" />
+          )}
+
+          {/* Blue stat — Active */}
+          {settings.showStats && total > 0 ? (
+            <div className="bg-mondrian-blue flex flex-col items-center justify-center py-8 text-center col-span-1">
+              <div className="text-4xl md:text-6xl font-black text-white leading-none">{active}</div>
+              <div className="text-white text-[10px] font-black uppercase tracking-widest mt-2">Active</div>
+            </div>
+          ) : (
+            <div className="bg-mondrian-blue col-span-1" />
+          )}
+
+          {/* Yellow stat — Issuers, spans 3 cols desktop to fill row */}
+          {settings.showStats && total > 0 ? (
+            <div className="bg-mondrian-yellow flex flex-col items-center justify-center py-8 text-center col-span-1 md:col-span-3">
+              <div className="text-4xl md:text-6xl font-black text-black leading-none">{issuers}</div>
+              <div className="text-black text-[10px] font-black uppercase tracking-widest mt-2">Issuing Bodies</div>
+            </div>
+          ) : (
+            <div className="bg-mondrian-yellow col-span-1 md:col-span-3" />
+          )}
+
+        </div>
+
+        {/* ── Filter / Sort bar ───────────────────────────────────────── */}
+        <div className="bg-black p-[3px] pt-0">
           <FilterSortBar
             filters={filters}
             onChange={setFilters}
             tags={tags}
             orgs={orgs}
           />
+        </div>
 
-          {certifications.length === 0 ? (
-            <div className="border-4 border-mondrian-black bg-mondrian-white/90 backdrop-blur-sm p-16 text-center">
-              <Award size={48} className="mx-auto mb-4 text-gray-200" />
-              <p className="font-display text-2xl font-bold text-gray-300">
-                No certifications yet
+        {/* ── Empty states ─────────────────────────────────────────────── */}
+        {certifications.length === 0 && (
+          <div className="bg-black p-[3px] pt-0">
+            <div className="bg-mondrian-white p-16 text-center">
+              <p className="font-black text-sm uppercase tracking-widest text-gray-400">
+                No certifications yet.
               </p>
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="border-4 border-mondrian-black bg-mondrian-white/90 backdrop-blur-sm p-16 text-center">
-              <p className="font-body text-sm text-gray-400 uppercase tracking-widest">
+          </div>
+        )}
+
+        {certifications.length > 0 && filtered.length === 0 && (
+          <div className="bg-black p-[3px] pt-0">
+            <div className="bg-mondrian-white p-16 text-center">
+              <p className="font-black text-sm uppercase tracking-widest text-gray-400">
                 No certifications match the current filters.
               </p>
             </div>
-          ) : (
-            <>
-              {/* Featured section */}
-              {filters.separateFeatured && featured.length > 0 && (
-                <section className="mb-12">
-                  <div className="flex items-center gap-4 mb-6">
-                    <h2 className="font-display text-3xl font-bold text-mondrian-black">
-                      Featured
-                    </h2>
-                    <div className="flex gap-1">
-                      <div className="h-1 w-6 bg-mondrian-red" />
-                      <div className="h-1 w-6 bg-mondrian-blue" />
-                      <div className="h-1 w-6 bg-mondrian-yellow" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {featured.map((cert, i) => (
-                      <CertCard
-                        key={cert.id}
-                        cert={cert}
-                        tags={tags}
-                        onClick={() => setModalCert(cert)}
-                        accentColor={FEATURED_ACCENTS[i % FEATURED_ACCENTS.length]}
-                      />
-                    ))}
-                  </div>
-                </section>
-              )}
+          </div>
+        )}
 
-              {/* All / remaining (when separateFeatured is false, rest = all certs) */}
-              {rest.length > 0 && (
-                <section>
-                  {filters.separateFeatured && featured.length > 0 && (
-                    <div className="flex items-center gap-4 mb-6">
-                      <h2 className="font-display text-3xl font-bold text-mondrian-black">
-                        All Certifications
-                      </h2>
-                      <div className="flex-1 h-0.5 bg-mondrian-black opacity-10" />
-                    </div>
-                  )}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {rest.map((cert) => (
-                      <CertCard
-                        key={cert.id}
-                        cert={cert}
-                        tags={tags}
-                        onClick={() => setModalCert(cert)}
-                      />
-                    ))}
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-        </main>
+        {/* ── Featured section ─────────────────────────────────────────── */}
+        {filters.separateFeatured && featured.length > 0 && (
+          <>
+            {/* Section label */}
+            <div className="bg-black px-[3px]">
+              <div className="bg-black flex items-center gap-4 px-5 py-3">
+                <span className="font-black text-xs uppercase tracking-widest text-mondrian-yellow">
+                  Featured
+                </span>
+                <div className="flex gap-1">
+                  <div className="h-[3px] w-5 bg-mondrian-red" />
+                  <div className="h-[3px] w-5 bg-mondrian-blue" />
+                  <div className="h-[3px] w-5 bg-mondrian-yellow" />
+                </div>
+              </div>
+            </div>
 
-        {/* Footer */}
-        <footer className="border-t-[6px] border-mondrian-black mt-16 bg-mondrian-white/95 backdrop-blur-sm">
+            {/* Featured cards grid — bg-black p-[3px] = black borders */}
+            <div className="bg-black p-[3px] pt-0 grid grid-cols-2 md:grid-cols-4 gap-0">
+              {featured.map((cert, i) => (
+                <CertCard
+                  key={cert.id}
+                  cert={cert}
+                  tags={tags}
+                  onClick={() => setModalCert(cert)}
+                  accentColor={FEATURED_ACCENTS[i % FEATURED_ACCENTS.length]}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ── All / Remaining certifications ──────────────────────────── */}
+        {rest.length > 0 && (
+          <>
+            {/* Section label — only shown when featured section also exists */}
+            {filters.separateFeatured && featured.length > 0 && (
+              <div className="bg-black px-[3px]">
+                <div className="bg-black flex items-center gap-4 px-5 py-3">
+                  <span className="font-black text-xs uppercase tracking-widest text-mondrian-white/50">
+                    All Certifications
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Cards grid */}
+            <div className="bg-black p-[3px] pt-0 grid grid-cols-2 md:grid-cols-4 gap-0">
+              {rest.map((cert) => (
+                <CertCard
+                  key={cert.id}
+                  cert={cert}
+                  tags={tags}
+                  onClick={() => setModalCert(cert)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ── Footer ──────────────────────────────────────────────────── */}
+        <footer className="bg-black border-t-[3px] border-mondrian-white/10 mt-[3px]">
           <div className="flex items-stretch">
-            <div className="flex items-center px-5 py-4 border-r-[6px] border-mondrian-black flex-1">
-              <span className="font-body text-xs text-gray-400 uppercase tracking-widest">
+            <div className="flex items-center px-5 py-4 border-r-[3px] border-mondrian-white/10 flex-1">
+              <span className="font-black text-xs text-mondrian-white/30 uppercase tracking-widest">
                 © {new Date().getFullYear()} Jacob Mann
               </span>
             </div>
             <a
               href="https://jacobmann.me"
-              className="flex items-center px-5 py-4 font-body text-xs font-semibold uppercase tracking-widest text-mondrian-black hover:bg-mondrian-yellow transition-colors duration-200"
+              className="flex items-center px-5 py-4 font-black text-xs uppercase tracking-widest text-mondrian-white/40 hover:bg-mondrian-yellow hover:text-black transition-colors duration-200"
             >
               jacobmann.me →
             </a>
           </div>
         </footer>
+
       </div>
 
       {/* Modal */}

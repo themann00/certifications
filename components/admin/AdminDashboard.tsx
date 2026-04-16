@@ -64,7 +64,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-mondrian-white">
+    <div className="min-h-screen bg-black">
       {/* Header — vertical border separator pattern from jacobmann.me */}
       <header className="bg-mondrian-black border-b-[6px] border-mondrian-black sticky top-0 z-20">
         <div className="flex items-stretch">
@@ -115,7 +115,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </header>
 
       {/* Tab bar */}
-      <div className="bg-mondrian-white border-b-[6px] border-mondrian-black">
+      <div className="bg-black border-b-[3px] border-mondrian-white/10">
         <div className="flex">
           {TABS.map((tab) => (
             <button
@@ -126,15 +126,15 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 }
                 setActiveTab(tab.id)
               }}
-              className={`px-6 py-3 font-body text-xs font-semibold uppercase tracking-widest border-b-[6px] -mb-[6px] border-r-[6px] border-r-mondrian-black transition-colors ${
+              className={`px-6 py-3 font-black text-[10px] uppercase tracking-widest border-b-[3px] -mb-[3px] border-r-[3px] border-r-mondrian-white/10 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-b-mondrian-blue text-mondrian-blue bg-white'
-                  : 'border-b-transparent text-gray-500 hover:text-black hover:bg-mondrian-yellow'
+                  ? 'border-b-mondrian-yellow text-mondrian-yellow'
+                  : 'border-b-transparent text-mondrian-white/40 hover:text-white hover:bg-mondrian-white/5'
               }`}
             >
               {tab.label}
               {tab.id === 'certifications' && certifications.length > 0 && (
-                <span className="ml-2 bg-gray-200 text-gray-500 text-[10px] px-1.5 py-px font-bold">
+                <span className="ml-2 bg-mondrian-white/10 text-mondrian-white/40 text-[9px] px-1.5 py-px font-black">
                   {certifications.length}
                 </span>
               )}
@@ -144,11 +144,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           {/* Skills — opens modal */}
           <button
             onClick={() => setSkillsModalOpen(true)}
-            className="px-6 py-3 font-body text-xs font-semibold uppercase tracking-widest border-b-[6px] border-b-transparent border-r-[6px] border-r-mondrian-black -mb-[6px] text-gray-500 hover:text-black hover:bg-mondrian-yellow transition-colors"
+            className="px-6 py-3 font-black text-[10px] uppercase tracking-widest border-b-[3px] border-b-transparent border-r-[3px] border-r-mondrian-white/10 -mb-[3px] text-mondrian-white/40 hover:text-white hover:bg-mondrian-white/5 transition-colors"
           >
             Skills
             {tags.length > 0 && (
-              <span className="ml-2 bg-gray-200 text-gray-500 text-[10px] px-1.5 py-px font-bold">
+              <span className="ml-2 bg-mondrian-white/10 text-mondrian-white/40 text-[9px] px-1.5 py-px font-black">
                 {tags.length}
               </span>
             )}
@@ -157,7 +157,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </div>
 
       {/* Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-8 py-8 text-mondrian-white">
         {loading ? (
           <div className="text-center py-20">
             <RefreshCw size={24} className="animate-spin mx-auto text-gray-300" />
