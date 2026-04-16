@@ -65,10 +65,10 @@ export default function CertList({ certifications, tags, onRefresh, onFetchFull,
     }
   }
 
-  async function startEdit(cert: Certification) {
+  async function startEdit(cert: PublicCertification) {
     // Fetch full cert (includes certificationId) from admin endpoint
     const full = await onFetchFull(cert.id)
-    setEditingCert(full ?? cert)
+    setEditingCert(full ?? null)
     setFormMode('edit')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
