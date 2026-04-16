@@ -26,7 +26,18 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
   const [saving, setSaving] = useState<string | null>(null) // certId being saved
   const [saved, setSaved] = useState<Set<string>>(new Set())
 
-  const certsWithoutImage = certifications.filter((c) => !c.imageUrl)
+  // Certs that need relinking: no imageUrl, OR imageUrl set but publicId not in Cloudinary
+  // (stale = points to a deleted Cloudinary asset)
+  const certsNeedingRelink = (status === 'done'
+    ? certifications.filter((c) => {
+        if (!c.imageUrl) return true
+        const fullCert = fullCerts.find((fc) => fc.id === c.id)
+        if (!fullCert?.imagePublicId) return false // has url but no publicId — can't verify
+        return !assets.some((a) => a.publicId === fullCert.imagePublicId)
+      })
+    : certifications.filter((c) => !c.imageUrl)
+  )
+  const certsWithoutImage = certsNeedingRelink
 
   async function fetchAssets() {
     setStatus('loading')
@@ -96,11 +107,20 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
     }
   }
 
-  if (certsWithoutImage.length === 0) {
+  // Only show "all good" after a Cloudinary fetch has confirmed it
+  if (status === 'done' && certsWithoutImage.length === 0) {
     return (
-      <div className="bg-white border-2 border-black p-5 flex items-center gap-3">
-        <CheckCircle size={16} className="text-green-600 flex-shrink-0" />
-        <p className="text-sm text-gray-600">All certifications have images linked.</p>
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-sm uppercase tracking-widest">Relink Images</h2>
+          <button onClick={fetchAssets} className="btn-secondary flex items-center gap-2">
+            <RefreshCw size={13} /> Refresh
+          </button>
+        </div>
+        <div className="bg-white border-2 border-black p-5 flex items-center gap-3">
+          <CheckCircle size={16} className="text-green-600 flex-shrink-0" />
+          <p className="text-sm text-gray-600">All certifications have verified Cloudinary assets.</p>
+        </div>
       </div>
     )
   }
@@ -116,29 +136,22 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
         <div>
           <h2 className="font-bold text-sm uppercase tracking-widest">Relink Images</h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            {certsWithoutImage.length} cert{certsWithoutImage.length !== 1 ? 's' : ''} missing image URL
+            {status !== 'done'
+              ? 'Fetch from Cloudinary to verify which images are broken'
+              : `${certsWithoutImage.length} cert${certsWithoutImage.length !== 1 ? 's' : ''} need relinking`}
           </p>
         </div>
-        {status === 'idle' || status === 'error' ? (
-          <button
-            onClick={fetchAssets}
-            className="btn-primary flex items-center gap-2"
-          >
-            <RefreshCw size={13} />
-            Fetch from Cloudinary
-          </button>
-        ) : status === 'loading' ? (
+        {status === 'loading' ? (
           <button disabled className="btn-primary flex items-center gap-2 opacity-50">
-            <RefreshCw size={13} className="animate-spin" />
-            Fetching…
+            <RefreshCw size={13} className="animate-spin" /> Fetching…
+          </button>
+        ) : status === 'done' ? (
+          <button onClick={fetchAssets} className="btn-secondary flex items-center gap-2">
+            <RefreshCw size={13} /> Refresh
           </button>
         ) : (
-          <button
-            onClick={fetchAssets}
-            className="btn-secondary flex items-center gap-2"
-          >
-            <RefreshCw size={13} />
-            Refresh
+          <button onClick={fetchAssets} className="btn-primary flex items-center gap-2">
+            <RefreshCw size={13} /> Fetch from Cloudinary
           </button>
         )}
       </div>
@@ -177,6 +190,7 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
               const isSaving = saving === cert.id
               const fullCert = fullCerts.find((c) => c.id === cert.id)
               const wasAutoMatched = fullCert?.imagePublicId && selectedPublicId === fullCert.imagePublicId
+              const isStale = !!cert.imageUrl && !selectedPublicId // has URL but asset missing from Cloudinary
 
               return (
                 <div key={cert.id} className="bg-white border-2 border-black p-4">
@@ -189,7 +203,12 @@ export default function RelinkImagesPanel({ certifications, onRefresh }: RelinkI
                           Auto-matched by public ID
                         </span>
                       )}
-                      {fullCert?.imagePublicId && !wasAutoMatched && (
+                      {isStale && (
+                        <span className="text-[10px] text-red-600 font-semibold uppercase tracking-wide">
+                          URL set but asset not found in Cloudinary
+                        </span>
+                      )}
+                      {fullCert?.imagePublicId && !wasAutoMatched && !isStale && (
                         <span className="text-[10px] text-amber-600 font-semibold uppercase tracking-wide">
                           Has public ID but not in Cloudinary
                         </span>
