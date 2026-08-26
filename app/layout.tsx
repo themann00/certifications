@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://certifications.jacobmann.me'),
+  twitter: { card: 'summary_large_image' },
   title: 'Jacob Mann — Certifications',
   description:
     'Professional certifications, licenses, and credentials earned by Jacob Mann.',
